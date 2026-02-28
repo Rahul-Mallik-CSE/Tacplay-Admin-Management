@@ -1,9 +1,9 @@
 /** @format */
-
 import React from "react";
+import PlayerList from "@/components/PlayerComponents/PlayerList";
 
 const PlayerPage = () => {
-  return <div>PlayerPage</div>;
+  return <PlayerList />;
 };
 
 export default PlayerPage;

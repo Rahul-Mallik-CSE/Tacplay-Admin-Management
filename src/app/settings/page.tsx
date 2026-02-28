@@ -1,9 +1,9 @@
 /** @format */
-
 import React from "react";
+import SettingsForm from "@/components/SettingsComponents/SettingsForm";
 
 const SettingsPage = () => {
-  return <div>SettingsPage</div>;
+  return <SettingsForm />;
 };
 
 export default SettingsPage;

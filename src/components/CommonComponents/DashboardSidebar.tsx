@@ -41,7 +41,7 @@ export default function DashboardSidebar() {
     {
       href: "/",
       icon: LayoutGrid,
-      label: "Dashboard",
+      label: "Overview",
     },
     {
       href: "/field-owner",

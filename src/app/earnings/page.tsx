@@ -1,9 +1,9 @@
 /** @format */
-
 import React from "react";
+import EarningsList from "@/components/EarningsComponents/EarningsList";
 
 const EarningsPage = () => {
-  return <div>EarningsPage</div>;
+  return <EarningsList />;
 };
 
 export default EarningsPage;

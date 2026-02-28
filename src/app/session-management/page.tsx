@@ -1,9 +1,9 @@
 /** @format */
-
 import React from "react";
+import SessionList from "@/components/SessionManagementComponents/SessionList";
 
 const SessionManagementPage = () => {
-  return <div>SessionManagementPage</div>;
+  return <SessionList />;
 };
 
 export default SessionManagementPage;
