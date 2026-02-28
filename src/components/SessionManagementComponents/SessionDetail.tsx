@@ -256,7 +256,7 @@ const SessionDetail = () => {
             <div className="grid grid-cols-5 items-center px-3 py-5 sm:px-6 sm:py-8">
               {/* Team A Logo + Name */}
               <div className="flex flex-col items-center gap-2 text-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden relative shrink-0">
+                <div className="w-6  h-6 md:w-16 md:h-16 rounded-full overflow-hidden relative shrink-0">
                   <Image
                     src="/green-team.png"
                     alt="Snake Green Squad"
@@ -264,43 +264,48 @@ const SessionDetail = () => {
                     className="object-cover"
                   />
                 </div>
-                <p className="text-primary text-[10px] sm:text-xs font-semibold leading-tight">
-                  Snake Green Squad
-                </p>
+                <div className="max-w-4 sm:max-w-6 md:max-w-none">
+                  <p className="text-primary text-[10px] sm:text-xs font-semibold leading-tight">
+                    Snake Green Squad
+                  </p>
+                </div>
               </div>
+              <div className="absolute right-[80%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-red-600 to-transparent transform -skew-x-[20deg]"></div>
 
               {/* Team A Score */}
-              <div className="text-center border-l border-white/10">
-                <p className="text-primary text-3xl sm:text-5xl font-black leading-none">
+              <div className="text-center">
+                <p className="text-primary text-xl sm:text-3xl lg:text-5xl font-black leading-none">
                   254
                 </p>
                 <p className="text-muted-foreground text-[10px] sm:text-xs mt-1">
                   Score
                 </p>
               </div>
+              <div className="absolute right-[60%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-red-600 to-transparent transform -skew-x-[20deg]"></div>
 
               {/* Center - Team Full */}
-              <div className="text-center border-l border-white/10">
-                <p className="text-primary text-2xl sm:text-4xl font-black leading-none">
+              <div className="text-center">
+                <p className="text-primary text-xl sm:text-3xl lg:text-5xl font-black leading-none">
                   8 / 8
                 </p>
                 <p className="text-muted-foreground text-[10px] sm:text-xs mt-1">
                   Team Full
                 </p>
               </div>
+              <div className="absolute right-[40%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-red-600 to-transparent transform -skew-x-[20deg]"></div>
 
               {/* Team B Score */}
-              <div className="text-center border-l border-white/10">
-                <p className="text-primary text-3xl sm:text-5xl font-black leading-none">
+              <div className="text-center">
+                <p className="text-primary text-xl sm:text-3xl lg:text-5xl font-black leading-none">
                   254
                 </p>
                 <p className="text-muted-foreground text-[10px] sm:text-xs mt-1">
                   Score
                 </p>
               </div>
-              <div className="absolute right-[30%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-red-600 to-transparent transform -skew-x-[20deg]"></div>
+              <div className="absolute right-[20%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-red-600 to-transparent transform -skew-x-[20deg]"></div>
               {/* Team B Logo + Name */}
-              <div className="flex flex-col items-center gap-2 text-center border-l border-white/10">
+              <div className="flex flex-col items-center gap-2 text-center ">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden relative shrink-0">
                   <Image
                     src="/red-team.png"
@@ -309,9 +314,11 @@ const SessionDetail = () => {
                     className="object-cover"
                   />
                 </div>
-                <p className="text-primary text-[10px] sm:text-xs font-semibold leading-tight">
-                  Red Bull Squad
-                </p>
+                <div className="max-w-4 sm:max-w-6 md:max-w-none">
+                  <p className="text-primary text-[10px] sm:text-xs font-semibold leading-tight">
+                    Red Bull Squad
+                  </p>
+                </div>
               </div>
             </div>
           </div>
