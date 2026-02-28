@@ -2,7 +2,8 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Clock } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import SessionInfoSheet from "./SessionInfoSheet";
@@ -216,51 +217,110 @@ const SessionDetail = () => {
       </div>
 
       {/* Match Header Card */}
-      <div className="bg-card rounded-xl border border-white/5 overflow-hidden">
-        {/* Match ID + Timer */}
-        <div className="flex items-center justify-center gap-4 py-3 border-b border-white/5">
-          <span className="text-muted-foreground text-sm">#CN 256</span>
-          <div className="flex items-center gap-1.5 bg-custom-red/10 border border-custom-red/30 rounded-full px-3 py-1">
-            <Clock className="w-3.5 h-3.5 text-custom-red" />
-            <span className="text-white text-sm font-bold tabular-nums">
-              50:25
-            </span>
-          </div>
-        </div>
-
-        {/* Scoreboard */}
-        <div className="grid grid-cols-3 items-center gap-2 p-4 sm:p-6">
-          {/* Team A */}
-          <div className="text-center space-y-2">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto text-xl">
-              🐍
+      <div
+        className="rounded-xl relative overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(152,0,9,0.25) 0%, rgba(16,15,23,1) 25%, rgba(16,15,23,1) 75%, rgba(152,0,9,0.25) 100%)",
+          padding: "1px",
+        }}
+      >
+        <div className="bg-card rounded-xl relative overflow-hidden">
+          {/* Match ID + Timer — skewed red box */}
+          <div className="flex items-center justify-center ">
+            <div
+              className="bg-custom-red px-8 py-2"
+              style={{
+                transform: "skewX(-20deg)",
+                borderBottomLeftRadius: "4px",
+                borderBottomRightRadius: "4px",
+                boxShadow: "0 4px 12px rgba(152, 0, 9, 0.5)",
+              }}
+            >
+              <div
+                className="flex items-center gap-3"
+                style={{ transform: "skewX(20deg)" }}
+              >
+                <span className="text-white text-xs font-semibold">
+                  #CN 256
+                </span>
+                <div className="w-px h-3 bg-white/30" />
+                <div className="flex items-center gap-2">
+                  <span className="text-white text-sm font-bold tabular-nums">
+                    50:25
+                  </span>
+                  <div className="w-16 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-full w-3/4 rounded-full bg-red-300" />
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="text-primary text-xs sm:text-sm font-semibold">
-              Snake Green Squad
-            </p>
           </div>
 
-          {/* Center */}
-          <div className="text-center space-y-1">
-            <p className="text-primary text-4xl sm:text-5xl font-black">254</p>
-            <p className="text-muted-foreground text-xs">Score</p>
-            <div className="my-2">
-              <span className="bg-secondary/20 text-secondary border border-secondary/30 text-xs px-2 py-0.5 rounded-full">
-                8 / 8 Team Full
-              </span>
-            </div>
-            <p className="text-muted-foreground text-xs">Score</p>
-            <p className="text-primary text-4xl sm:text-5xl font-black">254</p>
-          </div>
+          {/* Scoreboard */}
+          <div className="relative ">
+            {/* Scoreboard content */}
+            <div className="grid grid-cols-5 items-center px-3 py-5 sm:px-6 sm:py-8">
+              {/* Team A Logo + Name */}
+              <div className="flex flex-col items-center gap-2 text-center">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden relative shrink-0">
+                  <Image
+                    src="/green-team.png"
+                    alt="Snake Green Squad"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <p className="text-primary text-[10px] sm:text-xs font-semibold leading-tight">
+                  Snake Green Squad
+                </p>
+              </div>
 
-          {/* Team B */}
-          <div className="text-center space-y-2">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto text-xl">
-              🐂
+              {/* Team A Score */}
+              <div className="text-center border-l border-white/10">
+                <p className="text-primary text-3xl sm:text-5xl font-black leading-none">
+                  254
+                </p>
+                <p className="text-muted-foreground text-[10px] sm:text-xs mt-1">
+                  Score
+                </p>
+              </div>
+
+              {/* Center - Team Full */}
+              <div className="text-center border-l border-white/10">
+                <p className="text-primary text-2xl sm:text-4xl font-black leading-none">
+                  8 / 8
+                </p>
+                <p className="text-muted-foreground text-[10px] sm:text-xs mt-1">
+                  Team Full
+                </p>
+              </div>
+
+              {/* Team B Score */}
+              <div className="text-center border-l border-white/10">
+                <p className="text-primary text-3xl sm:text-5xl font-black leading-none">
+                  254
+                </p>
+                <p className="text-muted-foreground text-[10px] sm:text-xs mt-1">
+                  Score
+                </p>
+              </div>
+              <div className="absolute right-[30%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-red-600 to-transparent transform -skew-x-[20deg]"></div>
+              {/* Team B Logo + Name */}
+              <div className="flex flex-col items-center gap-2 text-center border-l border-white/10">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden relative shrink-0">
+                  <Image
+                    src="/red-team.png"
+                    alt="Red Bull Squad"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <p className="text-primary text-[10px] sm:text-xs font-semibold leading-tight">
+                  Red Bull Squad
+                </p>
+              </div>
             </div>
-            <p className="text-primary text-xs sm:text-sm font-semibold">
-              Red Bull Squad
-            </p>
           </div>
         </div>
       </div>
