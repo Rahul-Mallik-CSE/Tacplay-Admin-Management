@@ -217,14 +217,7 @@ const SessionDetail = () => {
       </div>
 
       {/* Match Header Card */}
-      <div
-        className="rounded-xl relative overflow-hidden"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(152,0,9,0.25) 0%, rgba(16,15,23,1) 25%, rgba(16,15,23,1) 75%, rgba(152,0,9,0.25) 100%)",
-          padding: "1px",
-        }}
-      >
+      <div className="rounded-xl relative overflow-hidden">
         <div className="bg-card rounded-xl relative overflow-hidden">
           {/* Match ID + Timer — skewed red box */}
           <div className="flex items-center justify-center ">
@@ -258,7 +251,7 @@ const SessionDetail = () => {
           </div>
 
           {/* Scoreboard */}
-          <div className="relative ">
+          <div className="relative border-4 border-border/20 rounded-2xl shadow-2xl shadow-amber-700">
             {/* Scoreboard content */}
             <div className="grid grid-cols-5 items-center px-3 py-5 sm:px-6 sm:py-8">
               {/* Team A Logo + Name */}
