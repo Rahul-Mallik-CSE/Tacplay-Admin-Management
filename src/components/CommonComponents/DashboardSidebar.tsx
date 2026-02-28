@@ -26,6 +26,8 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 import LogoutModal from "./LogOutModal";
+import { GrUserManager } from "react-icons/gr";
+import { FiUsers } from "react-icons/fi";
 
 export default function DashboardSidebar() {
   const { state } = useSidebar();
@@ -42,24 +44,24 @@ export default function DashboardSidebar() {
       label: "Dashboard",
     },
     {
-      href: "/sessions",
-      icon: Calendar,
-      label: "Sessions",
+      href: "/field-owner",
+      icon: GrUserManager,
+      label: "Field Owner",
     },
     {
-      href: "/booking-list",
-      icon: Briefcase,
-      label: "Booking List",
+      href: "/player",
+      icon: FiUsers,
+      label: "Player",
+    },
+    {
+      href: "/session-management",
+      icon: Calendar,
+      label: "Session Management",
     },
     {
       href: "/earnings",
       icon: Bell,
       label: "Earnings",
-    },
-    {
-      href: "/arena-management",
-      icon: Settings,
-      label: "Arena Management",
     },
     {
       href: "/settings",

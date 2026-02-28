@@ -37,7 +37,7 @@ const NavBar = () => {
     return null;
   return (
     <div className="w-full sticky top-0 z-9 ">
-      <div className="max-w-625 rounded-2xl mx-auto flex items-center justify-between  px-3  py-3">
+      <div className="max-w-625 rounded-2xl mx-auto flex items-center justify-between    py-3">
         <div className="flex gap-2 items-center justify-center">
           {/* mobile menu button */}
           <div className=" rounded-sm ">
