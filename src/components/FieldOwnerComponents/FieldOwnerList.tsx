@@ -50,11 +50,6 @@ const FieldOwnerList = () => {
       header: "User ID",
       accessor: (row: (typeof mockFieldOwners)[0]) => (
         <div className="flex items-center gap-2">
-          <Checkbox
-            checked={selected.includes(row.id)}
-            onCheckedChange={() => toggleSelect(row.id)}
-            className="border-white/20"
-          />
           <span className="text-primary/80">{row.id}</span>
         </div>
       ),

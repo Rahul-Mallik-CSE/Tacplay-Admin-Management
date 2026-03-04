@@ -8,6 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import CustomTable from "@/components/CommonComponents/CustomTable";
 import { cn } from "@/lib/utils";
+import { IoIosMan } from "react-icons/io";
+import { MdEmail } from "react-icons/md";
+import { BiSolidContact } from "react-icons/bi";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import { FaCrown, FaTrophy } from "react-icons/fa";
 
 const orderHistory = Array.from({ length: 20 }, () => ({
   sessionId: "#CH 565",
@@ -22,50 +27,58 @@ const infoCards = [
   {
     label: "Field Name",
     value: "Toggie Fun Club",
-    iconBg: "bg-secondary/20",
-    icon: "🏟️",
+    iconBg: "bg-[#F2AE40]/20",
+    iconclr: "text-[#F2AE40]",
+    icon: IoIosMan,
   },
   {
     label: "Email",
     value: "name0202@gmail.com",
-    iconBg: "bg-chart-1/20",
-    icon: "✉️",
+    iconBg: "bg-[#6E3FF3]/20",
+    iconclr: "text-[#6E3FF3]",
+    icon: MdEmail,
   },
   {
     label: "Contact Number",
     value: "name0202@gmail.com",
-    iconBg: "bg-emerald-500/20",
-    icon: "📞",
+    iconBg: "bg-[#35B9E9]/20",
+    iconclr: "text-[#35B9E9]",
+    icon: BiSolidContact,
   },
   {
     label: "Country",
     value: "name0202@gmail.com",
-    iconBg: "bg-chart-4/20",
-    icon: "🌍",
+    iconBg: "bg-[#38C793]/20",
+    iconclr: "text-[#38C793]",
+    icon: IoDocumentTextOutline,
   },
   {
     label: "Subscription Plan",
     value: "name0202@gmail.com",
-    iconBg: "bg-chart-1/20",
-    icon: "📋",
-  },
-  {
-    label: "AI Use",
-    value: "name0202@gmail.com",
-    iconBg: "bg-emerald-500/20",
-    icon: "🤖",
-  },
-  {
-    label: "Total Order",
-    value: "name0202@gmail.com",
-    iconBg: "bg-secondary/20",
-    icon: "🛒",
+    iconBg: "bg-[#F17B2C]/20",
+    iconclr: "text-[#F17B2C]",
+    icon: FaCrown,
   },
   {
     label: "Total Session",
-    value: "name0202@gmail.com",
-    iconBg: "bg-chart-5/20",
-    icon: "📅",
+    value: "128",
+    iconBg: "bg-[#35B9E9]/20",
+    iconclr: "text-[#35B9E9]",
+    icon: FaTrophy,
+  },
+  {
+    label: "Ranked Match",
+    value: "128",
+    iconBg: "bg-[#980009]/20",
+    iconclr: "text-[#980009]",
+    icon: FaCrown,
+  },
+  {
+    label: "Social Match",
+    value: "128",
+    iconBg: "bg-[#E1BD25]/20",
+    iconclr: "text-[#E1BD25]",
+    icon: FaCrown,
   },
 ];
 
@@ -91,11 +104,6 @@ const FieldOwnerDetail = () => {
       header: "Session ID",
       accessor: (row: (typeof orderHistory)[0]) => (
         <div className="flex items-center gap-2">
-          <Checkbox
-            checked={selected.includes(row.sessionId)}
-            onCheckedChange={() => toggleSelect(row.sessionId)}
-            className="border-white/20"
-          />
           <span>{row.sessionId}</span>
         </div>
       ),
@@ -108,7 +116,7 @@ const FieldOwnerDetail = () => {
   ];
 
   return (
-    <div className="p-4 sm:p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-2 md:space-y-4">
       {/* Back + Title */}
       <div className="flex items-center gap-3">
         <button
@@ -138,24 +146,21 @@ const FieldOwnerDetail = () => {
               </div>
             </div>
             <div>
-              <h2 className="text-primary text-lg sm:text-xl font-bold">
+              <h2 className="text-primary text-xl md:text-3xl font-bold">
                 Malik Ahmed
               </h2>
-              <p className="text-muted-foreground text-sm">User ID: #CN 256</p>
+              <p className="text-secondary text-sm md:text-lg">
+                User ID: #CN 256
+              </p>
             </div>
           </div>
           <div className="flex gap-2 self-start sm:self-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-custom-red text-custom-red hover:bg-custom-red/10 gap-1.5 text-xs"
-            >
+            <Button size="sm" className="">
               🚫 Suspended
             </Button>
             <Button
-              variant="outline"
               size="sm"
-              className="border-emerald-500 text-emerald-400 hover:bg-emerald-500/10 text-xs"
+              className="border-emerald-500 bg-[#38C793] text-primary hover:bg-[#38C793]/90 text-xs"
             >
               Approved
             </Button>
@@ -173,13 +178,14 @@ const FieldOwnerDetail = () => {
             <div className="flex items-center gap-2">
               <div
                 className={cn(
-                  "w-7 h-7 rounded-md flex items-center justify-center text-sm",
+                  "w-10 h-10 rounded-md flex items-center justify-center text-base",
                   card.iconBg,
+                  card.iconclr,
                 )}
               >
-                {card.icon}
+                {React.createElement(card.icon)}
               </div>
-              <p className="text-muted-foreground text-xs font-medium">
+              <p className="text-secondary text-lg md:text-xl font-medium">
                 {card.label}
               </p>
             </div>

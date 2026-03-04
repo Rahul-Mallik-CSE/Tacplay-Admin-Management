@@ -174,7 +174,7 @@ const CustomTable = <T extends Record<string, any>>({
                     <TableCell className="text-right py-3 sm:py-4">
                       <button
                         onClick={() => onAction(row)}
-                        className="p-1.5 sm:p-2 hover:bg-white/5 rounded-full transition-colors inline-flex items-center justify-center"
+                        className="cursor-pointer p-1.5 sm:p-2 hover:bg-white/5 rounded-full transition-colors inline-flex items-center justify-center"
                       >
                         <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-custom-yellow" />
                       </button>
