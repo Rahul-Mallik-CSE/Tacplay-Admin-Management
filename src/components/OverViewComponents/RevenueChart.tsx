@@ -75,31 +75,19 @@ const RevenueChart = () => {
   return (
     <div className="bg-card rounded-xl p-4 sm:p-6 border border-white/5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+      <div className="flex   justify-between gap-3 mb-2 md:mb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-primary text-base font-semibold">Revenue</h3>
+            <h3 className="text-primary text-base md:text-2xl font-semibold">
+              Revenue
+            </h3>
             <div className="flex items-center gap-1 text-emerald-400 text-xs font-medium">
               <TrendingUp className="w-3 h-3" />
               <span>+0.74%</span>
             </div>
           </div>
-          <p className="text-primary text-2xl sm:text-3xl font-bold">
-            $1864.18
-          </p>
         </div>
         <div className="flex items-center gap-4 self-start sm:self-auto">
-          {/* Legend */}
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-1 rounded-full bg-orange-400 inline-block" />
-              This week
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-1 rounded-full bg-secondary inline-block" />
-              Last week
-            </span>
-          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -129,6 +117,20 @@ const RevenueChart = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+      </div>
+      <div className="flex justify-between gap-3 mb-4 md:mb-8">
+        <p className="text-primary text-2xl md:text-3xl font-bold">$1864.18</p>
+        {/* Legend */}
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <span className="w-3 h-1 rounded-full bg-orange-400 inline-block" />
+            This week
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-3 h-1 rounded-full bg-secondary inline-block" />
+            Last week
+          </span>
         </div>
       </div>
 

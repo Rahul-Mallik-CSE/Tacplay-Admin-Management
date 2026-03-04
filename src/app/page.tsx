@@ -19,8 +19,8 @@ export default function Home() {
           title="Field Owner"
           value="293"
           change={-4.3}
-          iconBg="bg-secondary/20"
-          icon={<User className="w-5 h-5 text-secondary" />}
+          iconBg="bg-[#6E3FF3]/20"
+          icon={<User className="w-5 h-5 text-[#6E3FF3]" />}
         />
         <StatCard
           title="Player"

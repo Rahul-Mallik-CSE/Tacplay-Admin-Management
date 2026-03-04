@@ -17,8 +17,8 @@ const StatCard = ({ title, value, change, icon, iconBg }: StatCardProps) => {
   return (
     <div className="bg-card rounded-xl p-4 flex items-start justify-between gap-3 border border-white/5">
       <div className="flex flex-col gap-1.5">
-        <p className="text-muted-foreground text-xs font-medium">{title}</p>
-        <p className="text-primary text-xl sm:text-2xl font-bold">{value}</p>
+        <p className="text-secondary text-md md:text-lg font-medium">{title}</p>
+        <p className="text-primary text-2xl md:text-3xl font-bold">{value}</p>
         <div
           className={cn(
             "flex items-center gap-1 text-xs font-medium",

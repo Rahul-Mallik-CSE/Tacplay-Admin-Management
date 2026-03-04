@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import SessionInfoSheet from "./SessionInfoSheet";
 import MatchResultModal from "./MatchResultModal";
 import PlayerDetailsSheet from "./PlayerDetailsSheet";
+import PlayerCard from "./PlayerCard";
 
 interface Player {
   id: number;
@@ -104,81 +104,6 @@ const mockPlayers: Player[] = [
   },
 ];
 
-const PlayerCard = ({
-  player,
-  onViewDetails,
-  highlightScore,
-}: {
-  player: Player;
-  onViewDetails: (p: Player) => void;
-  highlightScore?: boolean;
-}) => (
-  <div
-    className={cn(
-      "bg-card rounded-xl p-3 border flex items-center gap-3",
-      highlightScore ? "border-chart-4/40" : "border-white/5",
-    )}
-  >
-    {/* Avatar */}
-    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-muted overflow-hidden shrink-0">
-      <div
-        className={cn(
-          "w-full h-full flex items-center justify-center text-xs font-bold text-white",
-          player.team === "A"
-            ? "bg-linear-to-br from-custom-red to-chart-1"
-            : "bg-linear-to-br from-chart-4 to-secondary",
-        )}
-      >
-        {player.name
-          .split(" ")
-          .map((n) => n[0])
-          .join("")}
-      </div>
-    </div>
-
-    {/* Info */}
-    <div className="flex-1 min-w-0">
-      <p className="text-primary text-xs sm:text-sm font-semibold truncate">
-        {player.name}
-      </p>
-      <div className="flex items-center gap-2 sm:gap-3 text-xs text-muted-foreground mt-1 flex-wrap">
-        <span>
-          <span className="text-primary font-medium">{player.win}</span> Win
-        </span>
-        <span>
-          <span className="text-primary font-medium">{player.loses}</span> Loses
-        </span>
-        <span>
-          <span className="text-primary font-medium">{player.played}</span>{" "}
-          Played
-        </span>
-        <span>
-          <span className="text-primary font-medium">{player.rank}</span> Rank
-        </span>
-        {player.score !== undefined && (
-          <span
-            className={cn(
-              "font-bold",
-              player.score > 0 ? "text-emerald-400" : "text-red-400",
-            )}
-          >
-            {player.score > 0 ? `+${player.score}` : player.score} Score
-          </span>
-        )}
-      </div>
-    </div>
-
-    {/* Button */}
-    <Button
-      size="sm"
-      className="bg-custom-red hover:bg-custom-red/90 text-white text-xs shrink-0 h-7 px-2.5"
-      onClick={() => onViewDetails(player)}
-    >
-      View Details
-    </Button>
-  </div>
-);
-
 const SessionDetail = () => {
   const router = useRouter();
   const [infoSheetOpen, setInfoSheetOpen] = useState(false);
@@ -251,7 +176,7 @@ const SessionDetail = () => {
           </div>
 
           {/* Scoreboard */}
-          <div className="relative border-4 border-border/20 rounded-2xl shadow-2xl shadow-amber-700">
+          <div className="relative border-4 border-border/20 rounded-4xl shadow-4xl shadow-amber-700">
             {/* Scoreboard content */}
             <div className="grid grid-cols-5 items-center px-3 py-5 sm:px-6 sm:py-8">
               {/* Team A Logo + Name */}
@@ -270,7 +195,7 @@ const SessionDetail = () => {
                   </p>
                 </div>
               </div>
-              <div className="absolute right-[80%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-red-600 to-transparent transform -skew-x-[20deg]"></div>
+              <div className="absolute right-[80%] top-0 bottom-0 w-px bg-linear-to-b from-transparent via-red-600 to-transparent transform -skew-x-[20deg]"></div>
 
               {/* Team A Score */}
               <div className="text-center">
@@ -328,25 +253,23 @@ const SessionDetail = () => {
       {/* Player Cards - Two Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Team A */}
-        <div className="space-y-3">
+        <div className="space-y-5">
           {teamAPlayers.map((player) => (
             <PlayerCard
               key={player.id}
               player={player}
               onViewDetails={(p) => setSelectedPlayer(p)}
-              highlightScore={player.score !== undefined && player.score > 0}
             />
           ))}
         </div>
 
         {/* Team B */}
-        <div className="space-y-3">
+        <div className="space-y-5">
           {teamBPlayers.map((player) => (
             <PlayerCard
               key={player.id}
               player={player}
               onViewDetails={(p) => setSelectedPlayer(p)}
-              highlightScore={player.score !== undefined && player.score > 0}
             />
           ))}
         </div>
