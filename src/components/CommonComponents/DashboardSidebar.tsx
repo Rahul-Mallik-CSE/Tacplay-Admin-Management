@@ -23,6 +23,7 @@ import {
   Bell,
   Settings,
   Crown,
+  LogOut,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import LogoutModal from "./LogOutModal";
@@ -105,11 +106,10 @@ export default function DashboardSidebar() {
                       ${isCollapsed ? "px-0.5" : "px-2"}`}
         >
           <div
-            className={`mb-6  flex  items-center justify-center rounded-md   ${
-              isCollapsed
-                ? " flex items-center w-full justify-center mx-auto p-1 "
-                : "gap-2"
-            }`}
+            className={`mb-6  flex  items-center justify-center rounded-md   ${isCollapsed
+              ? " flex items-center w-full justify-center mx-auto p-1 "
+              : "gap-2"
+              }`}
           >
             <Link href="/" className="flex gap-2 ">
               {isCollapsed ? (
@@ -160,7 +160,7 @@ export default function DashboardSidebar() {
         </SidebarContent>
         <SidebarFooter className="pb-16 bg-background rounded-b-4xl border-r-2 border-b-2 border-l-2 border-[#2C2740] shadow-neutral-600">
           {/* Upgrade Banner */}
-          {isCollapsed ? (
+          {/* {isCollapsed ? (
             <div className="flex justify-center mb-2">
               <Button
                 className="w-10 h-10 rounded-full flex items-center justify-center bg-linear-to-br from-[#980009] to-[#C00069] border-2 border-[#cdba20] shadow-lg"
@@ -172,7 +172,7 @@ export default function DashboardSidebar() {
           ) : (
             <div className="mx-2 mb-3 rounded-2xl border border-[#C00069] bg-[#100F17] p-3 shadow-[0_0_12px_rgba(192,0,105,0.25)]">
               <div className="flex items-center gap-3 mb-3">
-                {/* Seal badge */}
+               
                 <div className="relative shrink-0">
                   <div
                     className="w-12 h-12 bg-[#980009] flex items-center justify-center"
@@ -195,18 +195,18 @@ export default function DashboardSidebar() {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Logout */}
-          {/* <div className="w-full flex justify-center">
+          <div className="w-full flex justify-center">
             <Button
               variant="default"
               size="sm"
               className={cn(
-                "flex text-black grow items-center justify-center bg-gray-50 font-medium hover:bg-[#F5E9EA] hover:text-[#9E2729]",
+                "flex text-black grow items-center justify-center text-primary",
                 isCollapsed
                   ? "rounded-md w-8 h-8 p-0"
-                  : "h-10 md:h-12 w-full gap-2 rounded-md p-3",
+                  : "h-10 md:h-10 w-full gap-2 rounded-md p-3",
               )}
               onClick={() => setIsLogoutModalOpen(true)}
             >
@@ -219,7 +219,7 @@ export default function DashboardSidebar() {
                 </>
               )}
             </Button>
-          </div> */}
+          </div>
         </SidebarFooter>
       </Sidebar>
 
