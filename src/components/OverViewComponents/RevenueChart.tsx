@@ -135,7 +135,7 @@ const RevenueChart = () => {
       </div>
 
       {/* Chart */}
-      <div className="w-full h-52 sm:h-64">
+      <div className="w-full h-52 sm:h-80 md:h-96">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}

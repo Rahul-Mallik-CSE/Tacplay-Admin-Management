@@ -6,7 +6,7 @@ import { DollarSign, User, Users, Crown } from "lucide-react";
 export default function Home() {
   return (
     <div className="w-full py-2 md:py-3  space-y-6">
-      <div className="max-w-625 mx-auto">
+      <div className="max-w-625 mx-auto space-y-4 md:space-y-6">
         {/* Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <StatCard
