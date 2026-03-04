@@ -45,9 +45,9 @@ const SessionInfoSheet = ({
     <Sheet open={open} onOpenChange={onClose}>
       <SheetContent
         side="right"
-        className="bg-card border-l border-white/10 w-full sm:max-w-md overflow-y-auto p-5"
+        className="bg-card border-l border-white/10 w-full sm:max-w-md overflow-y-auto p-2 sm:p-5"
       >
-        <SheetHeader className="mb-4">
+        <SheetHeader className="">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-primary text-lg font-bold">
               Session Information&apos;s
@@ -62,10 +62,8 @@ const SessionInfoSheet = ({
         </SheetHeader>
 
         {/* Field Info */}
-        <div className="space-y-1 mb-4">
-          <h3 className="text-primary font-semibold text-sm mb-2">
-            Field Info
-          </h3>
+        <div className="space-y-0 ">
+          <h3 className="text-primary font-semibold text-sm ">Field Info</h3>
           <InfoRow label="Field ID" value="#CN 256" />
           <InfoRow label="Field Name" value="Imrul Hossain" />
           <InfoRow
@@ -75,13 +73,11 @@ const SessionInfoSheet = ({
           <InfoRow label="Contact Number" value="+26 256 2564" />
         </div>
 
-        <Separator className="bg-white/10 my-3" />
+        <Separator className="bg-white/10" />
 
         {/* Session Info */}
-        <div className="space-y-1 mb-4">
-          <h3 className="text-primary font-semibold text-sm mb-2">
-            Session Info
-          </h3>
+        <div className="space-y-0">
+          <h3 className="text-primary font-semibold text-sm ">Session Info</h3>
           <InfoRow label="Session ID" value="#CN 256" />
           <InfoRow label="Session Name" value="Friday Night Colorball Match" />
           <InfoRow
@@ -101,11 +97,11 @@ const SessionInfoSheet = ({
           <InfoRow label="Packages" value="Silver Premium" />
         </div>
 
-        <Separator className="bg-white/10 my-3" />
+        <Separator className="bg-white/10 " />
 
         {/* Team Info */}
-        <div className="space-y-1 mb-6">
-          <h3 className="text-primary font-semibold text-sm mb-2">Team Info</h3>
+        <div className="space-y-0">
+          <h3 className="text-primary font-semibold text-sm ">Team Info</h3>
           <InfoRow label="Team A Name" value="Red Bull Squad" />
           <InfoRow
             label="Team A Score"
@@ -119,8 +115,7 @@ const SessionInfoSheet = ({
         {/* Action Buttons */}
         <div className="flex gap-3">
           <Button
-            variant="outline"
-            className="flex-1 border-custom-red text-custom-red hover:bg-custom-red/10 text-sm"
+            className="flex-1 border-yellow-300 text-primary bg-custom-yellow hover:bg-custom-yellow/90 text-sm"
             onClick={onDisable}
           >
             Disable Match

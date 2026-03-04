@@ -55,9 +55,9 @@ const PlayerDetailsSheet = ({
         side="right"
         className="bg-card border-l border-white/10 w-full sm:max-w-md overflow-y-auto p-5"
       >
-        <SheetHeader className="mb-4">
+        <SheetHeader className="">
           <div className="flex items-center justify-between">
-            <SheetTitle className="text-primary text-lg font-bold">
+            <SheetTitle className="text-primary text-base font-bold">
               Player Details & Score Management
             </SheetTitle>
             <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-1 rounded-md font-medium">
@@ -70,10 +70,8 @@ const PlayerDetailsSheet = ({
         </SheetHeader>
 
         {/* Player Info */}
-        <div className="space-y-1 mb-4">
-          <h3 className="text-primary font-semibold text-sm mb-2">
-            Player Info
-          </h3>
+        <div className="space-y-0 ">
+          <h3 className="text-primary font-semibold text-sm ">Player Info</h3>
           <InfoRow label="Team name" value={teamName} />
           <InfoRow label="Player ID" value="#CN 256" />
           <InfoRow label="Player Name" value={playerName} />
@@ -81,13 +79,11 @@ const PlayerDetailsSheet = ({
           <InfoRow label="Contact Number" value="+26 256 2564" />
         </div>
 
-        <Separator className="bg-white/10 my-3" />
+        <Separator className="bg-white/10 " />
 
         {/* Booking Info */}
-        <div className="space-y-1 mb-4">
-          <h3 className="text-primary font-semibold text-sm mb-2">
-            Booking Info
-          </h3>
+        <div className="space-y-0 ">
+          <h3 className="text-primary font-semibold text-sm ">Booking Info</h3>
           <InfoRow label="Booking ID" value="#CNH 565" />
           <InfoRow label="Transaction ID" value="#CNH 565" />
           <InfoRow label="Amount" value="$25.25" />
@@ -109,10 +105,10 @@ const PlayerDetailsSheet = ({
           />
         </div>
 
-        <Separator className="bg-white/10 my-3" />
+        <Separator className="bg-white/10 " />
 
         {/* Score Management */}
-        <div className="space-y-3 mb-4">
+        <div className="space-y-0">
           <h3 className="text-primary font-semibold text-sm">
             Score Management
           </h3>

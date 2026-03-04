@@ -2,6 +2,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -13,6 +14,7 @@ interface Player {
   played: number;
   rank: number;
   score?: number;
+  image: string;
   team: "A" | "B";
 }
 
@@ -24,122 +26,161 @@ interface PlayerCardProps {
 const PlayerCard = ({ player, onViewDetails }: PlayerCardProps) => {
   const hasScore = player.score !== undefined;
   const isPositiveScore = hasScore && (player.score ?? 0) > 0;
+  const isYellowTheme = player.team === "B";
+
+  const frameGradient = isYellowTheme
+    ? "bg-[linear-gradient(135deg,#6a4b08,#d4b122,#3f2f0b)]"
+    : "bg-[linear-gradient(135deg,#5a0f1b,#d90f2f,#3b0c15)]";
+
+  const cardGlow = isYellowTheme
+    ? "shadow-[0_0_30px_rgba(221,180,29,0.25)]"
+    : "shadow-[0_0_28px_rgba(217,15,47,0.35)]";
+
+  const badgeTone = isYellowTheme ? "bg-[#e0b534]" : "bg-[#c01024]";
+  const buttonTone = isYellowTheme
+    ? "bg-custom-yellow text-black hover:bg-custom-yellow/90 border-custom-yellow/50"
+    : "bg-[#b1001f] text-white hover:bg-[#d3002a]";
+  const statNumberTone = isYellowTheme ? "text-[#ffe6a3]" : "text-white";
+  const statLabelTone = isYellowTheme
+    ? "text-[#c6aa65]"
+    : "text-muted-foreground";
 
   return (
-    <div
-      className={cn(
-        "relative rounded-xl p-3 sm:p-4 overflow-visible",
-        "bg-card",
-        hasScore
-          ? "border border-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.15)]"
-          : "border border-white/5",
-      )}
-    >
-      {/* Crown with blurred circular background */}
-      <div className="absolute -top-3 -left-3 z-10">
-        <div className="relative w-8 h-8 flex items-center justify-center">
-          {/* Blur glow circle */}
+    <div className="relative">
+      <div
+        className={cn(
+          "relative rounded-3xl p-[1px]  ",
+          frameGradient,
+          cardGlow,
+        )}
+      >
+        <div className="absolute inset-0 opacity-50 blur-3xl" aria-hidden>
           <div
             className={cn(
-              "absolute -inset-1 rounded-full blur-lg",
-              hasScore ? "bg-amber-500/50" : "bg-red-600/50",
+              "w-full h-full",
+              isYellowTheme
+                ? "bg-[radial-gradient(circle_at_15%_20%,rgba(255,200,64,0.3),transparent_45%),radial-gradient(circle_at_85%_0%,rgba(255,200,64,0.2),transparent_40%)]"
+                : "bg-[radial-gradient(circle_at_15%_20%,rgba(220,32,64,0.4),transparent_45%),radial-gradient(circle_at_85%_0%,rgba(220,32,64,0.25),transparent_40%)]",
             )}
           />
-          <div
-            className={cn(
-              "absolute inset-0 rounded-full",
-              hasScore ? "bg-amber-500/20" : "bg-red-600/20",
-            )}
-          />
-          <span className="relative text-base leading-none">👑</span>
-        </div>
-      </div>
-
-      {/* Card content */}
-      <div className="flex items-start gap-3">
-        {/* Avatar */}
-        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden shrink-0">
-          <div
-            className={cn(
-              "w-full h-full flex items-center justify-center text-sm font-bold text-white",
-              player.team === "A"
-                ? "bg-linear-to-br from-red-700 to-red-950"
-                : "bg-linear-to-br from-amber-600 to-red-900",
-            )}
-          >
-            {player.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")}
-          </div>
         </div>
 
-        {/* Right content */}
-        <div className="flex-1 min-w-0 space-y-2">
-          {/* Top row — Name + View Details */}
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-primary text-sm font-semibold truncate">
-              {player.name}
-            </p>
-            <Button
-              size="sm"
-              variant={hasScore ? "outline" : "default"}
-              className={cn(
-                "shrink-0 h-7 px-3 text-xs rounded-md font-medium cursor-pointer",
-                hasScore
-                  ? "border-emerald-400 text-emerald-400 bg-transparent hover:bg-emerald-400/10"
-                  : "bg-custom-red hover:bg-custom-red/90 text-white",
-              )}
-              onClick={() => onViewDetails(player)}
-            >
-              View Details
-            </Button>
+        <div className="relative flex gap-4 rounded-3xl bg-[#0c0a0c] p-3 sm:p-4">
+          {/* Crown badge */}
+          <div className="absolute -top-3 -left-3">
+            <div className="relative w-9 h-9 flex items-center justify-center">
+              <div
+                className={cn(
+                  "absolute -inset-1 rounded-full blur-lg",
+                  badgeTone,
+                  "opacity-70",
+                )}
+              />
+              <div
+                className={cn(
+                  "absolute inset-0 rounded-full border border-white/20",
+                  badgeTone,
+                )}
+              />
+              <span className="relative text-base">👑</span>
+            </div>
           </div>
 
-          {/* Bottom row — Stats (full width) */}
-          <div className="flex items-center gap-3 sm:gap-5 text-xs flex-wrap">
-            <span className="text-muted-foreground">
-              <span className="text-primary font-semibold">{player.win}</span>{" "}
-              Win
-            </span>
-            <span className="text-muted-foreground">
-              <span className="text-primary font-semibold">{player.loses}</span>{" "}
-              Loses
-            </span>
-            {hasScore ? (
-              <>
-                <span className="text-muted-foreground">
-                  <span className="text-primary font-semibold">
-                    {player.rank}
-                  </span>{" "}
-                  Rank
+          {/* Player image */}
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden shrink-0 ring-2 ring-white/10">
+            <Image
+              src={player.image}
+              alt={`${player.name} avatar`}
+              fill
+              sizes="112px"
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
+          </div>
+
+          {/* Right content */}
+          <div className="flex-1 min-w-0">
+            {/* Top row */}
+            <div className="flex items-center justify-between gap-3 pb-3 border-b border-white/10">
+              <p className="text-white text-base sm:text-lg font-semibold truncate">
+                {player.name}
+              </p>
+              <Button
+                size="sm"
+                className={cn(
+                  "h-8 px-3 text-xs rounded-lg font-semibold shadow-md",
+                  buttonTone,
+                )}
+                onClick={() => onViewDetails(player)}
+              >
+                View Details
+              </Button>
+            </div>
+
+            {/* Bottom row */}
+            <div className="grid grid-cols-5 items-center pt-3 text-center gap-0">
+              {["Win", "Loses", "Played", "Rank"].map((label, idx) => {
+                const value = [
+                  player.win,
+                  player.loses,
+                  player.played,
+                  player.rank,
+                ][idx];
+
+                return (
+                  <div
+                    key={label}
+                    className={cn(
+                      "flex flex-col gap-0.5",
+                      idx !== 0 && "border-l border-white/10",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "text-lg sm:text-xl font-black",
+                        statNumberTone,
+                      )}
+                    >
+                      {value}
+                    </span>
+                    <span
+                      className={cn(
+                        "text-[10px] sm:text-xs uppercase tracking-[0.08em]",
+                        statLabelTone,
+                      )}
+                    >
+                      {label}
+                    </span>
+                  </div>
+                );
+              })}
+
+              <div className="flex flex-col gap-0.5 border-l border-white/10">
+                <span
+                  className={cn(
+                    "text-lg sm:text-xl font-black",
+                    !hasScore && "text-muted-foreground",
+                    hasScore &&
+                      (isPositiveScore ? "text-emerald-400" : "text-[#ff4d4f]"),
+                  )}
+                >
+                  {hasScore
+                    ? isPositiveScore
+                      ? `+${player.score}`
+                      : player.score
+                    : "-"}
                 </span>
                 <span
                   className={cn(
-                    "font-bold",
-                    isPositiveScore ? "text-emerald-400" : "text-red-400",
+                    "text-[10px] sm:text-xs uppercase tracking-[0.08em]",
+                    statLabelTone,
                   )}
                 >
-                  {isPositiveScore ? `+${player.score}` : player.score}
-                  <span className="font-normal ml-1">Score</span>
+                  Score
                 </span>
-              </>
-            ) : (
-              <>
-                <span className="text-muted-foreground">
-                  <span className="text-primary font-semibold">
-                    {player.played}
-                  </span>{" "}
-                  Played
-                </span>
-                <span className="text-muted-foreground">
-                  <span className="text-primary font-semibold">
-                    {player.rank}
-                  </span>{" "}
-                  Rank
-                </span>
-              </>
-            )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

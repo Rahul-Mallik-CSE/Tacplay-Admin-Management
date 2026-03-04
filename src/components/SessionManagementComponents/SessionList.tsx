@@ -50,11 +50,6 @@ const SessionList = () => {
       header: "Session ID",
       accessor: (row: (typeof mockSessions)[0]) => (
         <div className="flex items-center gap-2">
-          <Checkbox
-            checked={selected.includes(row.id)}
-            onCheckedChange={() => toggleSelect(row.id)}
-            className="border-white/20"
-          />
           <span className="text-primary/80">{row.id}</span>
         </div>
       ),
@@ -67,7 +62,7 @@ const SessionList = () => {
   ];
 
   return (
-    <div className="p-4 sm:p-6 space-y-4">
+    <div className=" space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h1 className="text-primary text-xl sm:text-2xl font-bold">

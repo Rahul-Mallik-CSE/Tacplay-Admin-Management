@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import CustomTable from "@/components/CommonComponents/CustomTable";
 import { cn } from "@/lib/utils";
+import { MdEmail } from "react-icons/md";
+import { BiSolidContact } from "react-icons/bi";
+import { FaCrown, FaTrophy } from "react-icons/fa";
 
 const orderHistory = Array.from({ length: 20 }, () => ({
   orderId: "#PCH 565",
@@ -19,20 +22,38 @@ const orderHistory = Array.from({ length: 20 }, () => ({
 }));
 
 const statCards = [
-  { label: "Total Revenue", value: 125, iconBg: "bg-chart-1/20", icon: "💰" },
-  { label: "Total Scan", value: 125, iconBg: "bg-secondary/20", icon: "📷" },
-  { label: "AI Use", value: 125, iconBg: "bg-emerald-500/20", icon: "🤖" },
-  { label: "Total Order", value: 125, iconBg: "bg-chart-4/20", icon: "🛒" },
-  { label: "Menu Item", value: 125, iconBg: "bg-chart-5/20", icon: "🍽️" },
-  { label: "Total Scan", value: 125, iconBg: "bg-secondary/20", icon: "📷" },
-  { label: "AI Use", value: 125, iconBg: "bg-emerald-500/20", icon: "🤖" },
-  { label: "Total Table", value: 125, iconBg: "bg-chart-1/20", icon: "📋" },
+  {
+    label: "Email",
+    value: "name0202@gmail.com",
+    iconBg: "bg-[#6E3FF3]/20",
+    iconclr: "text-[#6E3FF3]",
+    icon: MdEmail,
+  },
+  {
+    label: "Contact Number",
+    value: "name0202@gmail.com",
+    iconBg: "bg-[#35B9E9]/20",
+    iconclr: "text-[#35B9E9]",
+    icon: BiSolidContact,
+  },
+  {
+    label: "Subscription Plan",
+    value: "name0202@gmail.com",
+    iconBg: "bg-[#F17B2C]/20",
+    iconclr: "text-[#F17B2C]",
+    icon: FaCrown,
+  },
+  {
+    label: "Total Matches Played",
+    value: "128",
+    iconBg: "bg-[#35B9E9]/20",
+    iconclr: "text-[#35B9E9]",
+    icon: FaTrophy,
+  },
 ];
-
 const PlayerDetail = () => {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<string[]>([]);
 
   const filtered = orderHistory.filter(
     (r) =>
@@ -40,22 +61,11 @@ const PlayerDetail = () => {
       r.orderId.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const toggleSelect = (id: string) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  };
-
   const columns = [
     {
       header: "Order ID",
       accessor: (row: (typeof orderHistory)[0]) => (
         <div className="flex items-center gap-2">
-          <Checkbox
-            checked={selected.includes(row.orderId)}
-            onCheckedChange={() => toggleSelect(row.orderId)}
-            className="border-white/20"
-          />
           <span>{row.orderId}</span>
         </div>
       ),
@@ -68,7 +78,7 @@ const PlayerDetail = () => {
   ];
 
   return (
-    <div className="p-4 sm:p-6 space-y-6">
+    <div className="space-y-6">
       {/* Back + Title */}
       <div className="flex items-center gap-3">
         <button
@@ -98,11 +108,7 @@ const PlayerDetail = () => {
               <p className="text-muted-foreground text-sm">User ID: #CN 256</p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-custom-red text-custom-red hover:bg-custom-red/10 gap-1.5 text-xs self-start sm:self-auto"
-          >
+          <Button size="sm" className="">
             🚫 Disable Account
           </Button>
         </div>
@@ -113,22 +119,25 @@ const PlayerDetail = () => {
         {statCards.map((card, i) => (
           <div
             key={i}
-            className="bg-card rounded-xl p-3 sm:p-4 border border-white/5"
+            className="bg-card rounded-xl p-3 sm:p-4 border border-white/5 space-y-2"
           >
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2">
               <div
                 className={cn(
-                  "w-7 h-7 rounded-md flex items-center justify-center text-sm",
+                  "w-10 h-10 rounded-md flex items-center justify-center text-base",
                   card.iconBg,
+                  card.iconclr,
                 )}
               >
-                {card.icon}
+                {React.createElement(card.icon)}
               </div>
-              <p className="text-muted-foreground text-xs font-medium">
+              <p className="text-secondary text-lg md:text-xl font-medium">
                 {card.label}
               </p>
             </div>
-            <p className="text-primary text-xl font-bold">{card.value}</p>
+            <p className="text-primary text-xs sm:text-sm truncate">
+              {card.value}
+            </p>
           </div>
         ))}
       </div>
