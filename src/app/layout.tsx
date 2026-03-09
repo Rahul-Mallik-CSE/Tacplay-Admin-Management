@@ -6,6 +6,7 @@ import "./globals.css";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/CommonComponents/DashboardSidebar";
 import NavBar from "@/components/CommonComponents/NabBar";
+import LayoutWrapper from "@/components/CommonComponents/LayoutWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,15 +33,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SidebarProvider>
-          <DashboardSidebar />
-          <SidebarInset className="overflow-x-hidden">
-            <div className={` bg-root-bg min-h-screen `}>
-              <NavBar />
-              {children}
-            </div>
-          </SidebarInset>
-        </SidebarProvider>
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   );
