@@ -78,7 +78,7 @@ const SessionList = () => {
               className="pl-9 bg-muted border-white/10 text-primary text-sm h-9 w-full sm:w-60"
             />
           </div>
-          <div className="flex gap-2">
+          {/* <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -95,7 +95,7 @@ const SessionList = () => {
               <ArrowUpDown className="w-3.5 h-3.5" />
               Sort by
             </Button>
-          </div>
+          </div> */}
         </div>
       </div>
 
