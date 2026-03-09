@@ -7,9 +7,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import AuthBanner from "@/components/AuthComponents/AuthBanner";
+import { useRouter } from "next/navigation";
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+
+  const handleSignIn = () => {
+    // Implement sign-in logic here
+    router.push("/");
+  };
 
   return (
     <AuthBanner>
@@ -79,7 +86,10 @@ const SignInPage = () => {
           </div>
 
           {/* Sign In Button */}
-          <button className="w-full py-3 rounded-lg bg-custom-red text-white text-sm font-semibold hover:bg-custom-red/90 transition-colors border-2 border-border">
+          <button
+            onClick={handleSignIn}
+            className="w-full py-3 rounded-lg bg-custom-red text-white text-sm font-semibold hover:bg-custom-red/90 transition-colors border-2 border-border"
+          >
             Sign In
           </button>
 
