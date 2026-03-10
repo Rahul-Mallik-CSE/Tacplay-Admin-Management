@@ -106,23 +106,22 @@ export default function DashboardSidebar() {
                       ${isCollapsed ? "px-0.5" : "px-2"}`}
         >
           <div
-            className={`mb-6  flex  items-center justify-center rounded-md   ${
-              isCollapsed
-                ? " flex items-center w-full justify-center mx-auto p-1 "
-                : "gap-2"
-            }`}
+            className={`mb-6  flex  items-center justify-center rounded-md   ${isCollapsed
+              ? " flex items-center w-full justify-center mx-auto p-1 "
+              : "gap-2"
+              }`}
           >
             <Link href="/" className="flex gap-2 ">
               {isCollapsed ? (
                 <Image src="/logo.png" alt="Logo" width={40} height={40} />
               ) : (
-                <div className="mt-2 flex items-center gap-2">
+                <div className="mt-2 flex items-center gap-2 h-10">
                   <Image
                     src="/Tacplay-logo-2.png"
                     alt="Logo"
                     width={150}
                     height={150}
-                    className="w-40 h-auto"
+                    className="w-40 h-10"
                     priority
                   />
                 </div>
