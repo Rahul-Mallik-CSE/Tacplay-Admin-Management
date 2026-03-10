@@ -106,10 +106,11 @@ export default function DashboardSidebar() {
                       ${isCollapsed ? "px-0.5" : "px-2"}`}
         >
           <div
-            className={`mb-6  flex  items-center justify-center rounded-md   ${isCollapsed
-              ? " flex items-center w-full justify-center mx-auto p-1 "
-              : "gap-2"
-              }`}
+            className={`mb-6  flex  items-center justify-center rounded-md   ${
+              isCollapsed
+                ? " flex items-center w-full justify-center mx-auto p-1 "
+                : "gap-2"
+            }`}
           >
             <Link href="/" className="flex gap-2 ">
               {isCollapsed ? (
@@ -121,6 +122,8 @@ export default function DashboardSidebar() {
                     alt="Logo"
                     width={150}
                     height={150}
+                    className="w-40 h-auto"
+                    priority
                   />
                 </div>
               )}
