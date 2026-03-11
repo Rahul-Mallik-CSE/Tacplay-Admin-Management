@@ -21,14 +21,17 @@ const SignInPage = () => {
   return (
     <AuthBanner>
       <div className="flex flex-col items-center">
-        {/* Logo */}
-        <Image
-          src="/Tacplay-logo-2.png"
-          alt="TacPlay"
-          width={100}
-          height={60}
-          className="object-contain mb-6"
-        />
+        <div className="h-12 mb-4">
+          {/* Logo */}
+          <Image
+            src="/Tacplay-logo-2.png"
+            alt="TacPlay"
+            width={200}
+            height={200}
+            className="object-contain h-12 "
+            priority
+          />
+        </div>
 
         {/* Heading */}
         <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-2 text-center">

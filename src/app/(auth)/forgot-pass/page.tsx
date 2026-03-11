@@ -14,16 +14,18 @@ const ForgotPasswordPage = () => {
 
       {/* Card */}
       <div className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-card/80 backdrop-blur-sm p-6 sm:p-8 space-y-6">
-        {/* Logo */}
-        <div className="flex justify-center">
+        <div className="h-6 flex items-center justify-center">
+          {/* Logo */}
           <Image
             src="/Tacplay-logo-2.png"
             alt="TacPlay"
-            width={80}
-            height={50}
-            className="object-contain"
+            width={200}
+            height={200}
+            className="object-contain h-12 "
+            priority
           />
         </div>
+
 
         {/* Heading */}
         <div className="text-center space-y-2">
