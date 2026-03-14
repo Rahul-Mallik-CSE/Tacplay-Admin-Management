@@ -23,6 +23,10 @@ const SettingsForm = () => {
     setModalStep(null);
   };
 
+  const handleSetScoreSave = () => {
+    setModalStep(null);
+  };
+
   return (
     <div className="">
       <div className="max-w-lg">
@@ -83,6 +87,17 @@ const SettingsForm = () => {
             </span>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </button>
+
+          {/* Set Score */}
+          <button
+            onClick={() => setModalStep("setScore")}
+            className="w-full flex items-center justify-between p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+          >
+            <span className="text-primary text-sm font-medium">
+              Set player Score
+            </span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </button>
         </div>
       </div>
 
@@ -93,6 +108,7 @@ const SettingsForm = () => {
         onEditSave={handleEditSave}
         onVerifySubmit={handleVerifySubmit}
         onPasswordChange={handlePasswordChange}
+        onSetScoreSave={handleSetScoreSave}
       />
     </div>
   );

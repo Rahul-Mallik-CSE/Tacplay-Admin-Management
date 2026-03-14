@@ -66,7 +66,7 @@ const SessionList = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h1 className="text-primary text-xl sm:text-2xl font-bold">
-          Restaurant Menu Lists
+          Session Management List
         </h1>
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative">

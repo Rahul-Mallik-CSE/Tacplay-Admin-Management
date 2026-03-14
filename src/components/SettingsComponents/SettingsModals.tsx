@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Camera } from "lucide-react";
 
-type SettingsStep = "edit" | "verify" | "password" | null;
+type SettingsStep = "edit" | "verify" | "password" | "setScore" | null;
 
 interface SettingsModalsProps {
   step: SettingsStep;
@@ -20,6 +20,7 @@ interface SettingsModalsProps {
   onEditSave: () => void;
   onVerifySubmit: () => void;
   onPasswordChange: () => void;
+  onSetScoreSave: () => void;
 }
 
 /* ── Edit Account Info Modal ── */
@@ -230,6 +231,82 @@ const NewPasswordModal = ({
   );
 };
 
+/* ── Set Player Score Modal ── */
+const SetScoreModal = ({
+  open,
+  onClose,
+  onSave,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSave: () => void;
+}) => {
+  const [winScore, setWinScore] = useState("");
+  const [loseScore, setLoseScore] = useState("");
+  const [drawScore, setDrawScore] = useState("");
+
+  const handleSubmit = () => {
+    // Here you can handle saving the scores, e.g., send to API
+    console.log("Scores:", { win: winScore, lose: loseScore, draw: drawScore });
+    onSave();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="bg-card border border-white/10 max-w-sm w-full rounded-2xl p-6">
+        <DialogHeader>
+          <DialogTitle className="text-primary text-lg font-bold text-center">
+            Set Player Score
+          </DialogTitle>
+          <DialogDescription className="text-muted-foreground text-xs text-center">
+            Set the scores for win, lose, and draw outcomes.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-3 my-4">
+          <div className="space-y-1">
+            <label className="text-muted-foreground text-xs">Win Score</label>
+            <Input
+              type="number"
+              placeholder="e.g., 3"
+              value={winScore}
+              onChange={(e) => setWinScore(e.target.value)}
+              className="bg-input border-white/10 text-primary"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-muted-foreground text-xs">Lose Score</label>
+            <Input
+              type="number"
+              placeholder="e.g., 0"
+              value={loseScore}
+              onChange={(e) => setLoseScore(e.target.value)}
+              className="bg-input border-white/10 text-primary"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-muted-foreground text-xs">Draw Score</label>
+            <Input
+              type="number"
+              placeholder="e.g., 1"
+              value={drawScore}
+              onChange={(e) => setDrawScore(e.target.value)}
+              className="bg-input border-white/10 text-primary"
+            />
+          </div>
+        </div>
+
+        <Button
+          className="w-full bg-custom-red hover:bg-custom-red/90 text-white"
+          onClick={handleSubmit}
+        >
+          Save Scores
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 /* ── Settings Modals Orchestrator ── */
 const SettingsModals = ({
   step,
@@ -237,6 +314,7 @@ const SettingsModals = ({
   onEditSave,
   onVerifySubmit,
   onPasswordChange,
+  onSetScoreSave,
 }: SettingsModalsProps) => {
   return (
     <>
@@ -250,6 +328,11 @@ const SettingsModals = ({
         open={step === "password"}
         onClose={onClose}
         onSave={onPasswordChange}
+      />
+      <SetScoreModal
+        open={step === "setScore"}
+        onClose={onClose}
+        onSave={onSetScoreSave}
       />
     </>
   );
