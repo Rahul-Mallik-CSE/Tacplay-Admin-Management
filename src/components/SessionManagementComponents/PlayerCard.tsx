@@ -66,7 +66,7 @@ const PlayerCard = ({ player, onViewDetails }: PlayerCardProps) => {
         </div>
 
         <div className="relative flex gap-4 rounded-3xl bg-[#0c0a0c] p-3 sm:p-4">
-          {/* Crown badge */}
+          {/* Badge */}
           <div className="absolute -top-3 -left-3">
             <div className="relative w-9 h-9 flex items-center justify-center">
               <div
@@ -76,13 +76,14 @@ const PlayerCard = ({ player, onViewDetails }: PlayerCardProps) => {
                   "opacity-70",
                 )}
               />
-              <div
-                className={cn(
-                  "absolute inset-0 rounded-full border border-white/20",
-                  badgeTone,
-                )}
+              <div className={cn("absolute ")} />
+              <Image
+                src={"/player-badge.png"}
+                alt="badge"
+                width={40}
+                height={40}
+                className="relative"
               />
-              <span className="relative text-base">👑</span>
             </div>
           </div>
 
