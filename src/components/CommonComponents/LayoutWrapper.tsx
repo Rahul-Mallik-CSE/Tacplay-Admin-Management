@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/CommonComponents/DashboardSidebar";
 import NavBar from "@/components/CommonComponents/NabBar";
+import { ToastContainer } from "react-toastify";
 
 const authRoutes = [
   "/sign-in",
@@ -31,6 +32,7 @@ export default function LayoutWrapper({
 
   return (
     <SidebarProvider>
+      <ToastContainer />
       <DashboardSidebar />
       <SidebarInset className="overflow-x-hidden">
         <div className="bg-root-bg min-h-screen ">

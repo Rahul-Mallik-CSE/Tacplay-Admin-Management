@@ -3,9 +3,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import DashboardSidebar from "@/components/CommonComponents/DashboardSidebar";
-import NavBar from "@/components/CommonComponents/NabBar";
 import LayoutWrapper from "@/components/CommonComponents/LayoutWrapper";
 
 const geistSans = Geist({
