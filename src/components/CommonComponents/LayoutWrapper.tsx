@@ -9,6 +9,28 @@ import DashboardSidebar from "@/components/CommonComponents/DashboardSidebar";
 import NavBar from "@/components/CommonComponents/NabBar";
 import { ToastContainer } from "react-toastify";
 
+import "react-toastify/dist/ReactToastify.css";
+
+const toastContainerProps = {
+  position: "top-center" as const,
+  autoClose: 4200,
+  limit: 4,
+  hideProgressBar: false,
+  newestOnTop: true,
+  closeOnClick: true,
+  rtl: false,
+  pauseOnFocusLoss: true,
+  draggable: true,
+  draggablePercent: 60,
+  pauseOnHover: true,
+  theme: "dark" as const,
+  className: "!p-3",
+  toastClassName:
+    "!bg-card/95 !backdrop-blur-md !border !border-white/10 !text-primary !rounded-xl !shadow-xl !min-h-0",
+  bodyClassName: "!p-0 !m-0 !items-start",
+  progressClassName: "!bg-custom-red",
+};
+
 const authRoutes = [
   "/sign-in",
   "/sign-up",
@@ -32,7 +54,7 @@ export default function LayoutWrapper({
 
   return (
     <SidebarProvider>
-      <ToastContainer />
+      <ToastContainer {...toastContainerProps} />
       <DashboardSidebar />
       <SidebarInset className="overflow-x-hidden">
         <div className="bg-root-bg min-h-screen ">
