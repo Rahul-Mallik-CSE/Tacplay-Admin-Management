@@ -1,79 +1,74 @@
 /** @format */
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import CustomTable from "@/components/CommonComponents/CustomTable";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-
-type FieldOwner = {
-  id: string;
-  ownerName: string;
-  fieldName: string;
-  email: string;
-  country: string;
-  applyDate: string;
-  userType: "Premium" | "Normal"; // ✅ added
-  status: string;
-};
-
-const initialFieldOwners: FieldOwner[] = Array.from({ length: 50 }, (_, i) => ({
-  id: `#CH ${565 + i}`,
-  ownerName: "Rahim Hossain",
-  fieldName: "Toggl Fun Club",
-  email: "kamrul@gmail.com",
-  country: "United Kingdom",
-  applyDate: "25 Jan, 2025",
-  userType: i % 2 === 0 ? "Premium" : "Normal", // ✅ added
-  status:
-    i % 5 === 0
-      ? "Pending"
-      : i % 5 === 1
-        ? "Approved"
-        : i % 5 === 2
-          ? "Suspended"
-          : i % 5 === 3
-            ? "Flagged"
-            : "Approved",
-}));
+import CustomTable from "@/components/CommonComponents/CustomTable";
+import CommonPageSkeleton from "@/components/CommonComponents/CommonPageSkeleton";
+import { Input } from "@/components/ui/input";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  setFieldOwnerListLimit,
+  setFieldOwnerListPage,
+  setFieldOwnerListSearch,
+} from "@/redux/features/fieldOwner/fieldOwnerSlice";
+import { useGetFieldOwnersQuery } from "@/redux/features/fieldOwner/fieldOwnerAPI";
+import type { FieldOwnerListItem } from "@/types/FieldOwner";
 
 const FieldOwnerList = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { search, page, limit } = useAppSelector(
+    (state) => state.fieldOwner.list,
+  );
+  const [searchInput, setSearchInput] = useState(search);
 
-  const [fieldOwners, setFieldOwners] =
-    useState<FieldOwner[]>(initialFieldOwners);
-  const [search, setSearch] = useState("");
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const trimmed = searchInput.trim();
+      if (trimmed !== search) {
+        dispatch(setFieldOwnerListSearch(trimmed));
+      }
+    }, 400);
 
-  // ✅ Filter
-  const filtered = fieldOwners.filter(
-    (r) =>
-      r.ownerName.toLowerCase().includes(search.toLowerCase()) ||
-      r.id.toLowerCase().includes(search.toLowerCase()) ||
-      r.fieldName.toLowerCase().includes(search.toLowerCase()),
+    return () => clearTimeout(timeoutId);
+  }, [dispatch, search, searchInput]);
+
+  const { data, isLoading, isFetching, isError } = useGetFieldOwnersQuery({
+    search,
+    status: "approve",
+    page,
+    limit,
+  });
+
+  const meta = data?.meta;
+
+  const tableData = useMemo(
+    () =>
+      (data?.data ?? []).map((item: FieldOwnerListItem) => ({
+        userId: item.user_id,
+        displayId: item.display_id,
+        ownerName: item.owner_name,
+        fieldName: item.field_name,
+        email: item.email,
+        country: item.country,
+        applyDate: new Date(item.apply_date).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+        status: item.status,
+        canView: item.can_view,
+      })),
+    [data?.data],
   );
 
-  // ✅ Toggle function
-  const toggleUserType = (id: string) => {
-    setFieldOwners((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              userType: p.userType === "Premium" ? "Normal" : "Premium",
-            }
-          : p,
-      ),
-    );
-  };
-
-  // ✅ Columns
   const columns = [
     {
       header: "User ID",
-      accessor: (row: FieldOwner) => (
-        <span className="text-primary/80">{row.id}</span>
+      accessor: (row: (typeof tableData)[number]) => (
+        <span className="text-primary/80">{row.displayId}</span>
       ),
     },
     { header: "Owner Name", accessor: "ownerName" as const },
@@ -83,41 +78,46 @@ const FieldOwnerList = () => {
     { header: "Apply Date", accessor: "applyDate" as const },
 
     // ✅ NEW COLUMN (Premium / Normal)
-    {
-      header: "User Type",
-      accessor: (row: FieldOwner) => (
-        <div className="flex items-center gap-2">
-          <span
-            className={`text-xs px-2 py-1 rounded ${
-              row.userType === "Premium"
-                ? "bg-yellow-500/20 text-yellow-400"
-                : "bg-gray-500/20 text-gray-300"
-            }`}
-          >
-            {row.userType}
-          </span>
+    // {
+    //   header: "User Type",
+    //   accessor: (row: FieldOwner) => (
+    //     <div className="flex items-center gap-2">
+    //       <span
+    //         className={`text-xs px-2 py-1 rounded ${
+    //           row.userType === "Premium"
+    //             ? "bg-yellow-500/20 text-yellow-400"
+    //             : "bg-gray-500/20 text-gray-300"
+    //         }`}
+    //       >
+    //         {row.userType}
+    //       </span>
 
-          <Button
-            size="sm"
-            variant="outline"
-            className="text-xs h-7"
-            onClick={() => toggleUserType(row.id)}
-          >
-            Switch
-          </Button>
-        </div>
-      ),
-    },
+    //       <Button
+    //         size="sm"
+    //         variant="outline"
+    //         className="text-xs h-7"
+    //         onClick={() => toggleUserType(row.id)}
+    //       >
+    //         Switch
+    //       </Button>
+    //     </div>
+    //   ),
+    // },
 
     { header: "Status", accessor: "status" as const },
   ];
 
+  const showSkeleton = isLoading && !data;
+
+  if (showSkeleton) {
+    return <CommonPageSkeleton titleWidthClass="w-36" columns={7} rows={8} />;
+  }
+
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h1 className="text-primary text-xl sm:text-2xl font-bold">
-          User List
+          Field Owner List
         </h1>
 
         <div className="flex flex-col sm:flex-row gap-2">
@@ -125,24 +125,40 @@ const FieldOwnerList = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="pl-9 bg-muted border-white/10 text-primary text-sm h-9 w-full sm:w-60"
             />
           </div>
         </div>
       </div>
 
-      {/* Table */}
+      {isError ? (
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+          Failed to load field owners.
+        </div>
+      ) : null}
+
+      {isFetching && !isLoading ? (
+        <p className="text-xs text-muted-foreground">Refreshing data...</p>
+      ) : null}
+
       <CustomTable
-        data={filtered}
+        data={tableData}
         columns={columns}
-        onAction={(row: FieldOwner) =>
-          router.push(
-            `/field-owner/${row.id.replace("#", "").replace(" ", "-")}`,
-          )
+        itemsPerPage={meta?.limit ?? limit}
+        currentPage={meta?.page ?? page}
+        totalPages={meta?.totalPage ?? 1}
+        totalItems={meta?.total ?? tableData.length}
+        onPageChange={(nextPage) => dispatch(setFieldOwnerListPage(nextPage))}
+        onItemsPerPageChange={(nextLimit) =>
+          dispatch(setFieldOwnerListLimit(nextLimit))
         }
-        itemsPerPage={10}
+        onAction={(row) => {
+          if (row.canView) {
+            router.push(`/field-owner/${row.userId}`);
+          }
+        }}
       />
     </div>
   );
