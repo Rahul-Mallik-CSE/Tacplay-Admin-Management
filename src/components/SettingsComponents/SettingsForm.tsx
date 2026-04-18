@@ -25,13 +25,22 @@ import { toast } from "react-toastify";
 import { getErrorMessage, getSuccessMessage, saveAuthTokens } from "@/lib/auth";
 import { useAppDispatch } from "@/redux/hooks";
 import { setAuthSession } from "@/redux/features/auth/authSlice";
+import { SettingsFormSkeleton } from "./SettingFormSkeleton";
 
 const SettingsForm = () => {
   const [modalStep, setModalStep] = useState<SettingsStep>(null);
   const dispatch = useAppDispatch();
 
-  const { data: myProfileResponse } = useGetMyProfileQuery();
-  const { data: scoreResponse } = useGetPlayerScoreSettingQuery();
+  const {
+    data: myProfileResponse,
+    isLoading: isProfileLoading,
+    isFetching: isProfileFetching,
+  } = useGetMyProfileQuery();
+  const {
+    data: scoreResponse,
+    isLoading: isScoreLoading,
+    isFetching: isScoreFetching,
+  } = useGetPlayerScoreSettingQuery();
 
   const [updateProfile, { isLoading: isUpdatingProfile }] =
     useUpdateProfileMutation();
@@ -46,6 +55,10 @@ const SettingsForm = () => {
   const profileName = profileUser?.full_name?.trim() || "User";
   const profileEmail = profileUser?.email_address?.trim() || "No email";
   const profileImage = toAbsoluteMediaUrl(profileUser?.profile_image);
+
+  const isInitialLoading =
+    (!myProfileResponse && (isProfileLoading || isProfileFetching)) ||
+    (!scoreResponse && (isScoreLoading || isScoreFetching));
 
   const getInitials = (name: string) => {
     const chunks = name.split(" ").filter(Boolean).slice(0, 2);
@@ -162,6 +175,10 @@ const SettingsForm = () => {
       toast.error(getErrorMessage(error, "Failed to save player score"));
     }
   };
+
+  if (isInitialLoading) {
+    return <SettingsFormSkeleton />;
+  }
 
   return (
     <div className="">
