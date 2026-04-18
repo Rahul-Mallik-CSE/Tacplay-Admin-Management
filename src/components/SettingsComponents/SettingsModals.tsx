@@ -1,6 +1,8 @@
 /** @format */
 "use client";
-import React, { useState } from "react";
+
+import React, { useMemo, useState } from "react";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -11,29 +13,101 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Camera } from "lucide-react";
+import { toAbsoluteMediaUrl } from "@/lib/utils";
 
-type SettingsStep = "edit" | "verify" | "password" | "setScore" | null;
+type SettingsStep = "edit" | "password" | "setScore" | null;
+
+type EditProfilePayload = {
+  fullName: string;
+  profileImageFile: File | null;
+};
+
+type ChangePasswordPayload = {
+  newPassword: string;
+  confirmPassword: string;
+};
+
+type PlayerScorePayload = {
+  winScore: number;
+  lossScore: number;
+  drawScore: number;
+};
 
 interface SettingsModalsProps {
   step: SettingsStep;
   onClose: () => void;
-  onEditSave: () => void;
-  onVerifySubmit: () => void;
-  onPasswordChange: () => void;
-  onSetScoreSave: () => void;
+  onEditSave: (payload: EditProfilePayload) => Promise<void>;
+  onPasswordChange: (payload: ChangePasswordPayload) => Promise<void>;
+  onSetScoreSave: (payload: PlayerScorePayload) => Promise<void>;
+  profileName?: string;
+  profileImage?: string | null;
+  scoreDefaults?: {
+    winScore: number;
+    lossScore: number;
+    drawScore: number;
+  };
+  isUpdatingProfile?: boolean;
+  isChangingPassword?: boolean;
+  isSavingScore?: boolean;
 }
 
-/* ── Edit Account Info Modal ── */
+const getInitials = (name: string) => {
+  const chunks = name.trim().split(" ").filter(Boolean).slice(0, 2);
+
+  if (chunks.length === 0) {
+    return "U";
+  }
+
+  return chunks.map((chunk) => chunk[0]?.toUpperCase() || "").join("");
+};
+
 const EditModal = ({
   open,
   onClose,
   onSave,
+  initialName,
+  initialProfileImage,
+  isSaving,
 }: {
   open: boolean;
   onClose: () => void;
-  onSave: () => void;
+  onSave: (payload: EditProfilePayload) => Promise<void>;
+  initialName: string;
+  initialProfileImage?: string | null;
+  isSaving: boolean;
 }) => {
-  const [name, setName] = useState("Sidney Paul");
+  const [name, setName] = useState(initialName);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
+
+  const initialImageUrl = useMemo(
+    () => toAbsoluteMediaUrl(initialProfileImage),
+    [initialProfileImage],
+  );
+
+  const handleFileChange = (file: File | null) => {
+    setSelectedFile(file);
+
+    if (!file) {
+      setPreviewDataUrl(null);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPreviewDataUrl(
+        typeof reader.result === "string" ? reader.result : null,
+      );
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = async () => {
+    await onSave({
+      fullName: name,
+      profileImageFile: selectedFile,
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -47,15 +121,37 @@ const EditModal = ({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Avatar */}
         <div className="flex justify-center my-4">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-linear-to-br from-chart-1 to-secondary flex items-center justify-center text-white text-xl font-bold">
-              SP
-            </div>
-            <button className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-custom-red flex items-center justify-center">
+            <label
+              htmlFor="settings-profile-image"
+              className="w-16 h-16 rounded-full bg-linear-to-br from-chart-1 to-secondary flex items-center justify-center text-white text-xl font-bold overflow-hidden cursor-pointer relative"
+            >
+              {previewDataUrl || initialImageUrl ? (
+                <Image
+                  src={previewDataUrl || initialImageUrl || ""}
+                  alt="Profile"
+                  fill
+                  unoptimized
+                  className="object-cover"
+                />
+              ) : (
+                getInitials(name || "User")
+              )}
+            </label>
+            <input
+              id="settings-profile-image"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
+            />
+            <label
+              htmlFor="settings-profile-image"
+              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-custom-red flex items-center justify-center cursor-pointer"
+            >
               <Camera className="w-3 h-3 text-white" />
-            </button>
+            </label>
           </div>
         </div>
 
@@ -73,113 +169,44 @@ const EditModal = ({
 
         <Button
           className="w-full bg-custom-red hover:bg-custom-red/90 text-white"
-          onClick={onSave}
+          onClick={handleSubmit}
+          disabled={isSaving}
         >
-          Save Changes
+          {isSaving ? "Saving..." : "Save Changes"}
         </Button>
       </DialogContent>
     </Dialog>
   );
 };
 
-/* ── Verify OTP Modal ── */
-const VerifyModal = ({
-  open,
-  onClose,
-  onSubmit,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: () => void;
-}) => {
-  const [code, setCode] = useState(["4", "7", "0", "9"]);
-
-  const handleChange = (index: number, val: string) => {
-    if (!/^\d?$/.test(val)) return;
-    const next = [...code];
-    next[index] = val;
-    setCode(next);
-    if (val && index < 3) {
-      const el = document.getElementById(`otp-${index + 1}`);
-      el?.focus();
-    }
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-card border border-white/10 max-w-sm w-full rounded-2xl p-6">
-        {/* Red circle icon */}
-        <div className="flex justify-center mb-4">
-          <div className="w-14 h-14 rounded-full bg-custom-red/20 border-4 border-custom-red/40 flex items-center justify-center">
-            <div className="w-6 h-6 rounded-full bg-custom-red" />
-          </div>
-        </div>
-
-        <DialogHeader>
-          <DialogTitle className="text-primary text-lg font-bold text-center">
-            Enter Verification Code
-          </DialogTitle>
-        </DialogHeader>
-
-        {/* OTP Inputs */}
-        <div className="flex justify-center gap-3 my-5">
-          {code.map((digit, i) => (
-            <input
-              key={i}
-              id={`otp-${i}`}
-              type="text"
-              maxLength={1}
-              value={digit}
-              onChange={(e) => handleChange(i, e.target.value)}
-              className="w-12 h-12 text-center text-primary text-xl font-bold bg-input border border-white/10 rounded-lg outline-none focus:border-custom-red transition-colors"
-            />
-          ))}
-        </div>
-
-        <Button
-          className="w-full bg-custom-red hover:bg-custom-red/90 text-white mb-3"
-          onClick={onSubmit}
-        >
-          Submit Code
-        </Button>
-        <p className="text-center text-xs text-muted-foreground">
-          Didn&apos;t receive the code?{" "}
-          <button className="text-custom-red hover:underline">
-            Resend code
-          </button>
-        </p>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-/* ── New Password Modal ── */
 const NewPasswordModal = ({
   open,
   onClose,
   onSave,
+  isSaving,
 }: {
   open: boolean;
   onClose: () => void;
-  onSave: () => void;
+  onSave: (payload: ChangePasswordPayload) => Promise<void>;
+  isSaving: boolean;
 }) => {
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = () => {
-    if (password !== confirm) {
-      setError(true);
+  const handleSubmit = async () => {
+    if (newPassword !== confirmPassword) {
+      setError("Confirm Password does not match New Password");
       return;
     }
-    setError(false);
-    onSave();
+
+    setError("");
+    await onSave({ newPassword, confirmPassword });
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="bg-card border border-white/10 max-w-sm w-full rounded-2xl p-6">
-        {/* Red circle icon */}
         <div className="flex justify-center mb-4">
           <div className="w-14 h-14 rounded-full bg-custom-red/20 border-4 border-custom-red/40 flex items-center justify-center">
             <div className="w-6 h-6 rounded-full bg-custom-red" />
@@ -195,60 +222,68 @@ const NewPasswordModal = ({
         <div className="space-y-3 my-4">
           <Input
             type="password"
-            placeholder="Password 1"
-            value={password}
+            placeholder="New password"
+            value={newPassword}
             onChange={(e) => {
-              setPassword(e.target.value);
-              setError(false);
+              setNewPassword(e.target.value);
+              setError("");
             }}
             className="bg-input border-white/10 text-primary"
           />
           <Input
             type="password"
-            placeholder="Confirm Password"
-            value={confirm}
+            placeholder="Confirm password"
+            value={confirmPassword}
             onChange={(e) => {
-              setConfirm(e.target.value);
-              setError(false);
+              setConfirmPassword(e.target.value);
+              setError("");
             }}
-            className={`bg-input text-primary ${error ? "border-custom-red" : "border-white/10"}`}
+            className={`bg-input text-primary ${
+              error ? "border-custom-red" : "border-white/10"
+            }`}
           />
-          {error && (
-            <p className="text-custom-red text-xs">
-              ✕ Confirm Password does not match the same as New Password
-            </p>
-          )}
+          {error && <p className="text-custom-red text-xs">{error}</p>}
         </div>
 
         <Button
           className="w-full bg-custom-red hover:bg-custom-red/90 text-white"
           onClick={handleSubmit}
+          disabled={isSaving}
         >
-          Change Password
+          {isSaving ? "Changing..." : "Change Password"}
         </Button>
       </DialogContent>
     </Dialog>
   );
 };
 
-/* ── Set Player Score Modal ── */
 const SetScoreModal = ({
   open,
   onClose,
   onSave,
+  defaults,
+  isSaving,
 }: {
   open: boolean;
   onClose: () => void;
-  onSave: () => void;
+  onSave: (payload: PlayerScorePayload) => Promise<void>;
+  defaults: {
+    winScore: number;
+    lossScore: number;
+    drawScore: number;
+  };
+  isSaving: boolean;
 }) => {
-  const [winScore, setWinScore] = useState("");
-  const [loseScore, setLoseScore] = useState("");
-  const [drawScore, setDrawScore] = useState("");
+  const [winScore, setWinScore] = useState(String(defaults.winScore));
+  const [lossScore, setLossScore] = useState(String(defaults.lossScore));
+  const [drawScore, setDrawScore] = useState(String(defaults.drawScore));
 
-  const handleSubmit = () => {
-    // Here you can handle saving the scores, e.g., send to API
-    console.log("Scores:", { win: winScore, lose: loseScore, draw: drawScore });
-    onSave();
+  const handleSubmit = async () => {
+    await onSave({
+      winScore: Number.parseInt(winScore || "0", 10),
+      lossScore: Number.parseInt(lossScore || "0", 10),
+      drawScore: Number.parseInt(drawScore || "0", 10),
+    });
   };
 
   return (
@@ -259,7 +294,7 @@ const SetScoreModal = ({
             Set Player Score
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-xs text-center">
-            Set the scores for win, lose, and draw outcomes.
+            Set the scores for win, loss, and draw outcomes.
           </DialogDescription>
         </DialogHeader>
 
@@ -268,19 +303,19 @@ const SetScoreModal = ({
             <label className="text-muted-foreground text-xs">Win Score</label>
             <Input
               type="number"
-              placeholder="e.g., 3"
+              placeholder="e.g., 5"
               value={winScore}
               onChange={(e) => setWinScore(e.target.value)}
               className="bg-input border-white/10 text-primary"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-muted-foreground text-xs">Lose Score</label>
+            <label className="text-muted-foreground text-xs">Loss Score</label>
             <Input
               type="number"
-              placeholder="e.g., 0"
-              value={loseScore}
-              onChange={(e) => setLoseScore(e.target.value)}
+              placeholder="e.g., -2"
+              value={lossScore}
+              onChange={(e) => setLossScore(e.target.value)}
               className="bg-input border-white/10 text-primary"
             />
           </div>
@@ -299,44 +334,70 @@ const SetScoreModal = ({
         <Button
           className="w-full bg-custom-red hover:bg-custom-red/90 text-white"
           onClick={handleSubmit}
+          disabled={isSaving}
         >
-          Save Scores
+          {isSaving ? "Saving..." : "Save Scores"}
         </Button>
       </DialogContent>
     </Dialog>
   );
 };
 
-/* ── Settings Modals Orchestrator ── */
 const SettingsModals = ({
   step,
   onClose,
   onEditSave,
-  onVerifySubmit,
   onPasswordChange,
   onSetScoreSave,
+  profileName = "User",
+  profileImage,
+  scoreDefaults = { winScore: 0, lossScore: 0, drawScore: 0 },
+  isUpdatingProfile = false,
+  isChangingPassword = false,
+  isSavingScore = false,
 }: SettingsModalsProps) => {
   return (
     <>
-      <EditModal open={step === "edit"} onClose={onClose} onSave={onEditSave} />
-      <VerifyModal
-        open={step === "verify"}
-        onClose={onClose}
-        onSubmit={onVerifySubmit}
-      />
-      <NewPasswordModal
-        open={step === "password"}
-        onClose={onClose}
-        onSave={onPasswordChange}
-      />
-      <SetScoreModal
-        open={step === "setScore"}
-        onClose={onClose}
-        onSave={onSetScoreSave}
-      />
+      {step === "edit" ? (
+        <EditModal
+          key={`edit-${profileName}-${profileImage || "none"}`}
+          open
+          onClose={onClose}
+          onSave={onEditSave}
+          initialName={profileName}
+          initialProfileImage={profileImage}
+          isSaving={isUpdatingProfile}
+        />
+      ) : null}
+
+      {step === "password" ? (
+        <NewPasswordModal
+          key="password"
+          open
+          onClose={onClose}
+          onSave={onPasswordChange}
+          isSaving={isChangingPassword}
+        />
+      ) : null}
+
+      {step === "setScore" ? (
+        <SetScoreModal
+          key={`score-${scoreDefaults.winScore}-${scoreDefaults.lossScore}-${scoreDefaults.drawScore}`}
+          open
+          onClose={onClose}
+          onSave={onSetScoreSave}
+          defaults={scoreDefaults}
+          isSaving={isSavingScore}
+        />
+      ) : null}
     </>
   );
 };
 
 export { SettingsModals };
-export type { SettingsStep };
+export type {
+  SettingsStep,
+  EditProfilePayload,
+  ChangePasswordPayload,
+  PlayerScorePayload,
+};
