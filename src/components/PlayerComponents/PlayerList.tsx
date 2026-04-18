@@ -1,143 +1,132 @@
 /** @format */
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import CustomTable from "@/components/CommonComponents/CustomTable";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-
-type Player = {
-  id: string;
-  userName: string;
-  email: string;
-  country: string;
-  sessionPoint: string;
-  matchesPlayed: number;
-  userType: "Premium" | "Normal";
-  status: string;
-};
-
-const initialPlayers: Player[] = Array.from({ length: 50 }, (_, i) => ({
-  id: `#CH ${565 + i}`,
-  userName: "Red Seafood Resort",
-  email: "name@gmail.com",
-  country: "United Kingdom",
-  sessionPoint: "$256.26",
-  matchesPlayed: 25,
-  userType: i % 2 === 0 ? "Premium" : "Normal", // ✅ added
-  status:
-    i % 4 === 0
-      ? "Pending"
-      : i % 4 === 1
-        ? "Active"
-        : i % 4 === 2
-          ? "Suspended"
-          : "Approved",
-}));
+import CustomTable from "@/components/CommonComponents/CustomTable";
+import CommonPageSkeleton from "@/components/CommonComponents/CommonPageSkeleton";
+import { Input } from "@/components/ui/input";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  setPlayerListLimit,
+  setPlayerListPage,
+  setPlayerListSearch,
+} from "@/redux/features/player/playerSlice";
+import { useGetPlayersQuery } from "@/redux/features/player/playerAPI";
+import type { PlayerListItem } from "@/types/PlayerTypes";
 
 const PlayerList = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { search, page, limit } = useAppSelector((state) => state.player.list);
+  const [searchInput, setSearchInput] = useState(search);
 
-  const [players, setPlayers] = useState<Player[]>(initialPlayers);
-  const [search, setSearch] = useState("");
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const trimmed = searchInput.trim();
+      if (trimmed !== search) {
+        dispatch(setPlayerListSearch(trimmed));
+      }
+    }, 400);
 
-  // ✅ Filter logic
-  const filtered = players.filter(
-    (r) =>
-      r.userName.toLowerCase().includes(search.toLowerCase()) ||
-      r.id.toLowerCase().includes(search.toLowerCase()),
+    return () => clearTimeout(timeoutId);
+  }, [dispatch, search, searchInput]);
+
+  const { data, isLoading, isFetching, isError } = useGetPlayersQuery({
+    search,
+    page,
+    limit,
+  });
+
+  const meta = data?.meta;
+
+  const tableData = useMemo(
+    () =>
+      (data?.data ?? []).map((item: PlayerListItem) => ({
+        userId: item.user_id,
+        displayId: item.display_id,
+        fullName: item.full_name,
+        email: item.email,
+        country: item.country,
+        sessionPlayed: item.session_played,
+        matchesPlayed: item.matches_played,
+        totalSpent: item.total_spent,
+        status: item.status,
+        canView: item.can_view,
+        subscriptionPlan: item.subscription_plan,
+      })),
+    [data?.data],
   );
 
-  // ✅ Toggle Premium / Normal
-  const toggleUserType = (id: string) => {
-    setPlayers((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              userType: p.userType === "Premium" ? "Normal" : "Premium",
-            }
-          : p,
-      ),
-    );
-  };
-
-  // ✅ Table Columns
   const columns = [
     {
       header: "User ID",
-      accessor: (row: Player) => (
-        <span className="text-primary/80">{row.id}</span>
+      accessor: (row: (typeof tableData)[number]) => (
+        <span className="text-primary/80">{row.displayId}</span>
       ),
     },
-    { header: "User Name", accessor: "userName" as const },
+    { header: "Full Name", accessor: "fullName" as const },
     { header: "Email", accessor: "email" as const },
     { header: "Country", accessor: "country" as const },
-    { header: "Session Point", accessor: "sessionPoint" as const },
+    { header: "Session Played", accessor: "sessionPlayed" as const },
     { header: "Matches Played", accessor: "matchesPlayed" as const },
-
-    // ✅ NEW COLUMN (Premium / Normal + Button) dont need to remove this code, just comment it out if you dont want to use it
-    // {
-    //   header: "User Type",
-    //   accessor: (row: Player) => (
-    //     <div className="flex items-center gap-2">
-    //       <span
-    //         className={`text-xs px-2 py-1 rounded ${
-    //           row.userType === "Premium"
-    //             ? "bg-yellow-500/20 text-yellow-400"
-    //             : "bg-gray-500/20 text-gray-300"
-    //         }`}
-    //       >
-    //         {row.userType}
-    //       </span>
-
-    //       <Button
-    //         size="sm"
-    //         variant="outline"
-    //         className="text-xs h-7"
-    //         onClick={() => toggleUserType(row.id)}
-    //       >
-    //         Switch
-    //       </Button>
-    //     </div>
-    //   ),
-    // },
-
+    { header: "Total Spent", accessor: "totalSpent" as const },
     { header: "Status", accessor: "status" as const },
   ];
 
+  const showSkeleton = isLoading && !data;
+
+  if (showSkeleton) {
+    return <CommonPageSkeleton titleWidthClass="w-36" columns={6} rows={12} />;
+  }
+
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h1 className="text-primary text-xl sm:text-2xl font-bold">
           Player Lists
         </h1>
 
         <div className="flex flex-col sm:flex-row gap-2">
-          {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="pl-9 bg-muted border-white/10 text-primary text-sm h-9 w-full sm:w-60"
             />
           </div>
         </div>
       </div>
 
-      {/* Table */}
+      {isError ? (
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+          Failed to load players.
+        </div>
+      ) : null}
+
+      {isFetching && !isLoading ? (
+        <p className="text-xs text-muted-foreground">Refreshing data...</p>
+      ) : null}
+
       <CustomTable
-        data={filtered}
+        data={tableData}
         columns={columns}
-        onAction={(row: Player) =>
-          router.push(`/player/${row.id.replace("#", "").replace(" ", "-")}`)
+        itemsPerPage={meta?.limit ?? limit}
+        currentPage={meta?.page ?? page}
+        totalPages={meta?.totalPage ?? 1}
+        totalItems={meta?.total ?? tableData.length}
+        onPageChange={(nextPage) => dispatch(setPlayerListPage(nextPage))}
+        onItemsPerPageChange={(nextLimit) =>
+          dispatch(setPlayerListLimit(nextLimit))
         }
-        itemsPerPage={10}
+        onAction={(row) => {
+          if (row.canView) {
+            router.push(`/player/${row.userId}`);
+          }
+        }}
       />
     </div>
   );

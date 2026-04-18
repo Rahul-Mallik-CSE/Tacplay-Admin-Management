@@ -3,10 +3,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import CustomTable from "@/components/CommonComponents/CustomTable";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, ArrowUpDown } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Search } from "lucide-react";
 
 const mockSessions = Array.from({ length: 50 }, (_, i) => ({
   id: `#CH ${565 + i}`,
@@ -31,19 +29,12 @@ const mockSessions = Array.from({ length: 50 }, (_, i) => ({
 const SessionList = () => {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<string[]>([]);
 
   const filtered = mockSessions.filter(
     (r) =>
       r.sessionName.toLowerCase().includes(search.toLowerCase()) ||
       r.id.toLowerCase().includes(search.toLowerCase()),
   );
-
-  const toggleSelect = (id: string) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  };
 
   const columns = [
     {
