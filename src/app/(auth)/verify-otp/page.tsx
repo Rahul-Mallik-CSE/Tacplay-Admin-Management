@@ -4,11 +4,30 @@
 
 import React, { useState, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import {
+  useResendForgotPasswordOtpMutation,
+  useVerifyForgotPasswordOtpMutation,
+} from "@/redux/features/auth/authAPI";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  clearPendingVerification,
+  setAuthSession,
+} from "@/redux/features/auth/authSlice";
+import { getErrorMessage, getSuccessMessage, saveAuthTokens } from "@/lib/auth";
 
 const VerifyOtpPage = () => {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const pendingEmail = useAppSelector((state) => state.auth.pendingEmail);
+
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [verifyForgotPasswordOtp, { isLoading: isVerifying }] =
+    useVerifyForgotPasswordOtpMutation();
+  const [resendForgotPasswordOtp, { isLoading: isResending }] =
+    useResendForgotPasswordOtpMutation();
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -40,6 +59,54 @@ const VerifyOtpPage = () => {
     inputRefs.current[nextIndex]?.focus();
   };
 
+  const handleVerifyOtp = async () => {
+    if (!pendingEmail) {
+      toast.error("Please submit your email first");
+      router.push("/forgot-pass");
+      return;
+    }
+
+    const otpCode = otp.join("");
+    if (otpCode.length !== 6) {
+      toast.error("Please enter the 6-digit OTP");
+      return;
+    }
+
+    try {
+      const response = await verifyForgotPasswordOtp({
+        email_address: pendingEmail,
+        otp_code: otpCode,
+      }).unwrap();
+
+      saveAuthTokens(response.accessToken, response.refreshToken);
+      dispatch(setAuthSession(response.user));
+      dispatch(clearPendingVerification());
+
+      toast.success(getSuccessMessage(response, "OTP verified"));
+      router.push("/reset-pass");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "OTP verification failed"));
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!pendingEmail) {
+      toast.error("Please submit your email first");
+      router.push("/forgot-pass");
+      return;
+    }
+
+    try {
+      const response = await resendForgotPasswordOtp({
+        email_address: pendingEmail,
+      }).unwrap();
+
+      toast.success(getSuccessMessage(response, "OTP resent successfully"));
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to resend OTP"));
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-root-bg relative overflow-hidden px-4">
       {/* Red gradient glow at bottom */}
@@ -66,7 +133,7 @@ const VerifyOtpPage = () => {
           <p className="text-xs sm:text-sm text-muted-foreground">
             We sent a verification code to{" "}
             <span className="text-custom-yellow font-medium">
-              example@email.com
+              {pendingEmail || "your email"}
             </span>
           </p>
         </div>
@@ -94,17 +161,25 @@ const VerifyOtpPage = () => {
         </div>
 
         {/* Submit Button */}
-        <Link href="/reset-pass">
-          <button className="w-full py-3 rounded-lg bg-custom-red text-white text-sm font-semibold hover:bg-custom-red/90 transition-colors border-2 border-border mt-2">
-            Send Code
-          </button>
-        </Link>
+        <button
+          type="button"
+          onClick={handleVerifyOtp}
+          disabled={isVerifying}
+          className="w-full py-3 rounded-lg bg-custom-red text-white text-sm font-semibold hover:bg-custom-red/90 transition-colors border-2 border-border mt-2"
+        >
+          {isVerifying ? "Verifying..." : "Verify Code"}
+        </button>
 
         {/* Resend */}
         <p className="text-sm text-center text-muted-foreground">
           Didn&apos;t receive the code?{" "}
-          <button className="text-custom-yellow font-semibold hover:underline transition-colors">
-            Resend
+          <button
+            type="button"
+            onClick={handleResendOtp}
+            disabled={isResending}
+            className="text-custom-yellow font-semibold hover:underline transition-colors"
+          >
+            {isResending ? "Resending..." : "Resend"}
           </button>
         </p>
       </div>

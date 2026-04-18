@@ -2,9 +2,9 @@
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { hasAccessToken } from "@/lib/auth";
-import type { AuthUser } from "@/redux/features/auth/authAPI";
+import type { AuthUser } from "@/types/AuthTypes";
 
-type VerificationPurpose = "signup" | "forgot-password" | null;
+type VerificationPurpose = "forgot-password" | null;
 
 type AuthState = {
   isAuthenticated: boolean;

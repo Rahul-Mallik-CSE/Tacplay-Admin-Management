@@ -8,14 +8,51 @@ import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import AuthBanner from "@/components/AuthComponents/AuthBanner";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { saveAuthTokens, getErrorMessage, getSuccessMessage } from "@/lib/auth";
+import { useLoginAdminMutation } from "@/redux/features/auth/authAPI";
+import { useAppDispatch } from "@/redux/hooks";
+import { setAuthSession } from "@/redux/features/auth/authSlice";
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const [loginAdmin, { isLoading }] = useLoginAdminMutation();
 
-  const handleSignIn = () => {
-    // Implement sign-in logic here
-    router.push("/");
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!email.trim() || !password.trim()) {
+      toast.error("Email and password are required");
+      return;
+    }
+
+    try {
+      const response = await loginAdmin({
+        email_address: email.trim(),
+        password,
+      }).unwrap();
+
+      const access = response.data.tokens.access;
+      const refresh = response.data.tokens.refresh;
+
+      saveAuthTokens(access, refresh);
+      dispatch(setAuthSession(response.data.user));
+
+      toast.success(getSuccessMessage(response, "Login successful"));
+
+      const from =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("from")
+          : null;
+
+      router.push(from || "/");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Login failed"));
+    }
   };
 
   return (
@@ -42,16 +79,19 @@ const SignInPage = () => {
         </p>
 
         {/* Form */}
-        <div className="w-full space-y-5">
+        <form onSubmit={handleSignIn} className="w-full space-y-5">
           {/* Business Email */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-primary">
-              Business Email
+              Email Address
             </label>
             <input
               type="email"
               placeholder="Enter your email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2.5 rounded-lg bg-input/30 border border-white/10 text-sm text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-custom-yellow/50 transition-colors"
+              autoComplete="email"
             />
           </div>
 
@@ -72,7 +112,10 @@ const SignInPage = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2.5 pr-11 rounded-lg bg-input/30 border border-white/10 text-sm text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-custom-yellow/50 transition-colors"
+                autoComplete="current-password"
               />
               <button
                 type="button"
@@ -90,12 +133,13 @@ const SignInPage = () => {
 
           {/* Sign In Button */}
           <button
-            onClick={handleSignIn}
+            type="submit"
+            disabled={isLoading}
             className="w-full cursor-pointer py-3 rounded-lg bg-custom-red text-white text-sm font-semibold hover:bg-custom-red/90 transition-colors border-2 border-border"
           >
-            Sign In
+            {isLoading ? "Signing In..." : "Sign In"}
           </button>
-        </div>
+        </form>
       </div>
     </AuthBanner>
   );

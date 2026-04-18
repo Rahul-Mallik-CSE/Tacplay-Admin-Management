@@ -2,11 +2,49 @@
 
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { useForgotPasswordMutation } from "@/redux/features/auth/authAPI";
+import { useAppDispatch } from "@/redux/hooks";
+import { setPendingVerification } from "@/redux/features/auth/authSlice";
+import { getErrorMessage, getSuccessMessage } from "@/lib/auth";
 
 const ForgotPasswordPage = () => {
+  const [email, setEmail] = useState("");
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!email.trim()) {
+      toast.error("Email address is required");
+      return;
+    }
+
+    try {
+      const response = await forgotPassword({
+        email_address: email.trim(),
+      }).unwrap();
+
+      dispatch(
+        setPendingVerification({
+          email: response.data.email_address,
+          purpose: "forgot-password",
+        }),
+      );
+
+      toast.success(getSuccessMessage(response, "OTP sent successfully"));
+      router.push("/verify-otp");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to send OTP"));
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-root-bg relative overflow-hidden px-4">
       {/* Red gradient glow at bottom */}
@@ -26,7 +64,6 @@ const ForgotPasswordPage = () => {
           />
         </div>
 
-
         {/* Heading */}
         <div className="text-center space-y-2">
           <h1 className="text-xl sm:text-2xl font-bold text-primary">
@@ -39,7 +76,7 @@ const ForgotPasswordPage = () => {
         </div>
 
         {/* Form */}
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-primary">
               Email Address
@@ -47,16 +84,21 @@ const ForgotPasswordPage = () => {
             <input
               type="email"
               placeholder="Enter your email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2.5 rounded-lg bg-input/30 border border-white/10 text-sm text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-custom-yellow/50 transition-colors"
+              autoComplete="email"
             />
           </div>
 
-          <Link href="/verify-otp">
-            <button className="w-full py-3 rounded-lg bg-custom-red text-white text-sm font-semibold hover:bg-custom-red/90 transition-colors border-2 border-border mt-2">
-              Send Code
-            </button>
-          </Link>
-        </div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-3 rounded-lg bg-custom-red text-white text-sm font-semibold hover:bg-custom-red/90 transition-colors border-2 border-border mt-2"
+          >
+            {isLoading ? "Sending..." : "Send Code"}
+          </button>
+        </form>
 
         {/* Back to sign in */}
         <p className="text-sm text-center text-muted-foreground">

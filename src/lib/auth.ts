@@ -1,6 +1,7 @@
 /** @format */
 
 import { jwtDecode } from "jwt-decode";
+import { SESSION_COOKIE_NAME } from "@/lib/session-cookie";
 
 type JwtPayload = {
   exp?: number;
@@ -83,11 +84,13 @@ export const saveAuthTokens = (accessToken: string, refreshToken: string) => {
 
   setCookie(ACCESS_TOKEN_COOKIE, accessToken, accessTokenMaxAge);
   setCookie(REFRESH_TOKEN_COOKIE, refreshToken, refreshTokenMaxAge);
+  setCookie(SESSION_COOKIE_NAME, "1", refreshTokenMaxAge ?? accessTokenMaxAge);
 };
 
 export const clearAuthTokens = () => {
   clearCookie(ACCESS_TOKEN_COOKIE);
   clearCookie(REFRESH_TOKEN_COOKIE);
+  clearCookie(SESSION_COOKIE_NAME);
 };
 
 export const getAccessToken = () => getCookieValue(ACCESS_TOKEN_COOKIE);
