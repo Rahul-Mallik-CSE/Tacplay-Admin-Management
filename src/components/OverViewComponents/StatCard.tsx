@@ -31,7 +31,7 @@ const StatCard = ({ title, value, change, icon, iconBg }: StatCardProps) => {
             <TrendingDown className="w-3 h-3" />
           )}
           <span>
-            {Math.abs(change)}% {isUp ? "Up" : "Down"} from past week
+            {Math.abs(change)}% {isUp ? "Up" : "Down"} from last period
           </span>
         </div>
       </div>

@@ -1,6 +1,6 @@
 /** @format */
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import {
   AreaChart,
   Area,
@@ -11,34 +11,20 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { TrendingUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
 
-const weeklyData = [
-  { day: "Mon", thisWeek: 1100, lastWeek: 1200 },
-  { day: "Tue", thisWeek: 900, lastWeek: 1500 },
-  { day: "Wed", thisWeek: 800, lastWeek: 2200 },
-  { day: "Thu", thisWeek: 950, lastWeek: 3400 },
-  { day: "Fri", thisWeek: 1050, lastWeek: 2800 },
-  { day: "Sat", thisWeek: 1200, lastWeek: 3200 },
-  { day: "Sun", thisWeek: 1400, lastWeek: 2600 },
-  { day: "Mon", thisWeek: 1800, lastWeek: 1800 },
-  { day: "Tue", thisWeek: 1600, lastWeek: 1600 },
-  { day: "Wed", thisWeek: 1300, lastWeek: 1300 },
-];
+type RevenueChartPoint = {
+  label: string;
+  thisPeriodAmount: number;
+  lastPeriodAmount: number;
+};
 
-const monthlyData = [
-  { day: "Week 1", thisWeek: 4200, lastWeek: 3800 },
-  { day: "Week 2", thisWeek: 5600, lastWeek: 4200 },
-  { day: "Week 3", thisWeek: 4800, lastWeek: 5100 },
-  { day: "Week 4", thisWeek: 6200, lastWeek: 4700 },
-];
+type RevenueChartProps = {
+  totalRevenue: number;
+  changePercentage: number;
+  seriesLabel: string;
+  comparisonSeriesLabel: string;
+  data: RevenueChartPoint[];
+};
 
 interface TooltipPayloadItem {
   color: string;
@@ -68,68 +54,60 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   return null;
 };
 
-const RevenueChart = () => {
-  const [period, setPeriod] = useState("This Week");
-  const data = period === "This Week" ? weeklyData : monthlyData;
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const compactCurrencyFormatter = new Intl.NumberFormat("en-US", {
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+
+const RevenueChart = ({
+  totalRevenue,
+  changePercentage,
+  seriesLabel,
+  comparisonSeriesLabel,
+  data,
+}: RevenueChartProps) => {
+  const isUp = changePercentage >= 0;
 
   return (
     <div className="bg-card rounded-xl p-4 sm:p-6 border border-white/5">
       {/* Header */}
-      <div className="flex   justify-between gap-3 mb-2 md:mb-4">
+      <div className="flex justify-between gap-3 mb-2 md:mb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h3 className="text-primary text-base md:text-2xl font-semibold">
               Revenue
             </h3>
-            <div className="flex items-center gap-1 text-emerald-400 text-xs font-medium">
+            <div
+              className={`flex items-center gap-1 text-xs font-medium ${
+                isUp ? "text-emerald-400" : "text-red-400"
+              }`}
+            >
               <TrendingUp className="w-3 h-3" />
-              <span>+0.74%</span>
+              <span>{`${isUp ? "+" : ""}${changePercentage.toFixed(2)}%`}</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-4 self-start sm:self-auto">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-xs h-8 bg-muted border-white/10 text-primary gap-1"
-              >
-                {period}
-                <ChevronDown className="w-3 h-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="bg-card border-white/10"
-            >
-              <DropdownMenuItem
-                onClick={() => setPeriod("This Week")}
-                className="text-xs cursor-pointer"
-              >
-                This Week
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setPeriod("This Month")}
-                className="text-xs cursor-pointer"
-              >
-                This Month
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
       </div>
       <div className="flex justify-between gap-3 mb-4 md:mb-8">
-        <p className="text-primary text-2xl md:text-3xl font-bold">$1864.18</p>
+        <p className="text-primary text-2xl md:text-3xl font-bold">
+          {currencyFormatter.format(totalRevenue)}
+        </p>
         {/* Legend */}
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-1 rounded-full bg-orange-400 inline-block" />
-            This week
+            {seriesLabel}
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-1 rounded-full bg-secondary inline-block" />
-            Last week
+            {comparisonSeriesLabel}
           </span>
         </div>
       </div>
@@ -157,7 +135,7 @@ const RevenueChart = () => {
               vertical={false}
             />
             <XAxis
-              dataKey="day"
+              dataKey="label"
               tick={{ fill: "#525273", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
@@ -166,28 +144,28 @@ const RevenueChart = () => {
               tick={{ fill: "#525273", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={(v) => `$${v >= 1000 ? v / 1000 + "k" : v}`}
+              tickFormatter={(v) => `$${compactCurrencyFormatter.format(v)}`}
             />
             <Tooltip content={<CustomTooltip />} />
             <Area
               type="monotone"
-              dataKey="lastWeek"
+              dataKey="lastPeriodAmount"
               stroke="#525273"
               strokeWidth={2}
               fill="url(#lastWeekGrad)"
               dot={false}
               activeDot={{ r: 4, fill: "#525273" }}
-              name="Last week"
+              name={comparisonSeriesLabel}
             />
             <Area
               type="monotone"
-              dataKey="thisWeek"
+              dataKey="thisPeriodAmount"
               stroke="#f97316"
               strokeWidth={2}
               fill="url(#thisWeekGrad)"
               dot={false}
               activeDot={{ r: 4, fill: "#f97316" }}
-              name="This week"
+              name={seriesLabel}
             />
           </AreaChart>
         </ResponsiveContainer>
