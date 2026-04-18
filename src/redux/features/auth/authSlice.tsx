@@ -1,7 +1,7 @@
 /** @format */
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { hasAccessToken } from "@/lib/auth";
+import { getStoredAuthUser, hasAccessToken } from "@/lib/auth";
 import type { AuthUser } from "@/types/AuthTypes";
 
 type VerificationPurpose = "forgot-password" | null;
@@ -13,9 +13,11 @@ type AuthState = {
   verificationPurpose: VerificationPurpose;
 };
 
+const initialUser = getStoredAuthUser();
+
 const initialState: AuthState = {
   isAuthenticated: hasAccessToken(),
-  user: null,
+  user: initialUser,
   pendingEmail: "",
   verificationPurpose: null,
 };

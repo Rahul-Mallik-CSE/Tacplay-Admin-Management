@@ -1,7 +1,7 @@
 /** @format */
 "use client";
 
-import { Bell, ChevronDown, User, UserCog, LogOut } from "lucide-react";
+import { ChevronDown, User, UserCog, LogOut } from "lucide-react";
 import Image from "next/image";
 
 import {
@@ -14,24 +14,44 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import LogoutModal from "./LogOutModal";
 import { SidebarTrigger } from "../ui/sidebar";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { toAbsoluteMediaUrl } from "@/lib/utils";
+import { useLogoutMutation } from "@/redux/features/auth/authAPI";
+import {
+  clearAuthTokens,
+  getErrorMessage,
+  getSuccessMessage,
+} from "@/lib/auth";
+import { clearAuthSession } from "@/redux/features/auth/authSlice";
+import { toast } from "react-toastify";
 
 const NavBar = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [logout] = useLogoutMutation();
 
   const hasEmail = Boolean(user?.email?.trim());
   const displayName = user?.full_name?.trim() || "User";
   const profileImage = toAbsoluteMediaUrl(user?.profile_image);
   const showProfileImage = hasEmail && Boolean(profileImage);
 
-  const handleLogout = () => {
-    console.log("Logging out...");
-    setIsLogoutModalOpen(false);
-    router.push("/sign-in");
+  const handleLogout = async () => {
+    try {
+      const response = await logout().unwrap();
+      toast.success(getSuccessMessage(response, "Logged out successfully"));
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, "Logout failed, clearing local session"),
+      );
+    } finally {
+      clearAuthTokens();
+      dispatch(clearAuthSession());
+      setIsLogoutModalOpen(false);
+      router.push("/sign-in");
+    }
   };
   if (
     pathname == "/sign-in" ||
@@ -58,15 +78,6 @@ const NavBar = () => {
 
         {/* Right side - Notification, Profile */}
         <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-          {/* Notification Bell */}
-          <button
-            onClick={() => router.push("/notifications")}
-            className="cursor-pointer text-secondary hover:text-primary border border-secondary  hover:border-primary relative p-1.5 sm:p-2  rounded-full transition-colors shrink-0"
-          >
-            <Bell className="w-4 h-4 sm:w-5 sm:h-5 " />
-            <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-2 h-2 bg-[#E1BD25] rounded-full"></span>
-          </button>
-
           {/* Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger className="flex cursor-pointer border border-transparent hover:border-secondary items-center gap-1 sm:gap-2  rounded-lg px-1 sm:px-2 py-1 transition-colors shrink-0">

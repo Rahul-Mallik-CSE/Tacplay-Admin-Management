@@ -2,6 +2,7 @@
 
 import { jwtDecode } from "jwt-decode";
 import { SESSION_COOKIE_NAME } from "@/lib/session-cookie";
+import type { AuthUser } from "@/types/AuthTypes";
 
 type JwtPayload = {
   exp?: number;
@@ -9,6 +10,7 @@ type JwtPayload = {
 
 export const ACCESS_TOKEN_COOKIE = "accessToken";
 export const REFRESH_TOKEN_COOKIE = "refreshToken";
+export const AUTH_USER_COOKIE = "authUser";
 export const COOKIE_PATH = "/";
 
 const isBrowser = typeof window !== "undefined";
@@ -91,6 +93,7 @@ export const clearAuthTokens = () => {
   clearCookie(ACCESS_TOKEN_COOKIE);
   clearCookie(REFRESH_TOKEN_COOKIE);
   clearCookie(SESSION_COOKIE_NAME);
+  clearCookie(AUTH_USER_COOKIE);
 };
 
 export const getAccessToken = () => getCookieValue(ACCESS_TOKEN_COOKIE);
@@ -98,6 +101,29 @@ export const getAccessToken = () => getCookieValue(ACCESS_TOKEN_COOKIE);
 export const getRefreshToken = () => getCookieValue(REFRESH_TOKEN_COOKIE);
 
 export const hasAccessToken = () => Boolean(getAccessToken());
+
+export const saveAuthUser = (user: AuthUser) => {
+  setCookie(AUTH_USER_COOKIE, JSON.stringify(user));
+};
+
+export const getStoredAuthUser = (): AuthUser | null => {
+  const user = getCookieValue(AUTH_USER_COOKIE);
+
+  if (!user) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(user) as AuthUser;
+  } catch {
+    clearCookie(AUTH_USER_COOKIE);
+    return null;
+  }
+};
+
+export const clearAuthUser = () => {
+  clearCookie(AUTH_USER_COOKIE);
+};
 
 type ApiError = {
   status?: number;
