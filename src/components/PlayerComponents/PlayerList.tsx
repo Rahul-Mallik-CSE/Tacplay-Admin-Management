@@ -31,10 +31,10 @@ const initialPlayers: Player[] = Array.from({ length: 50 }, (_, i) => ({
     i % 4 === 0
       ? "Pending"
       : i % 4 === 1
-      ? "Active"
-      : i % 4 === 2
-      ? "Suspended"
-      : "Approved",
+        ? "Active"
+        : i % 4 === 2
+          ? "Suspended"
+          : "Approved",
 }));
 
 const PlayerList = () => {
@@ -47,7 +47,7 @@ const PlayerList = () => {
   const filtered = players.filter(
     (r) =>
       r.userName.toLowerCase().includes(search.toLowerCase()) ||
-      r.id.toLowerCase().includes(search.toLowerCase())
+      r.id.toLowerCase().includes(search.toLowerCase()),
   );
 
   // ✅ Toggle Premium / Normal
@@ -59,8 +59,8 @@ const PlayerList = () => {
               ...p,
               userType: p.userType === "Premium" ? "Normal" : "Premium",
             }
-          : p
-      )
+          : p,
+      ),
     );
   };
 
@@ -78,32 +78,32 @@ const PlayerList = () => {
     { header: "Session Point", accessor: "sessionPoint" as const },
     { header: "Matches Played", accessor: "matchesPlayed" as const },
 
-    // ✅ NEW COLUMN (Premium / Normal + Button)
-    {
-      header: "User Type",
-      accessor: (row: Player) => (
-        <div className="flex items-center gap-2">
-          <span
-            className={`text-xs px-2 py-1 rounded ${
-              row.userType === "Premium"
-                ? "bg-yellow-500/20 text-yellow-400"
-                : "bg-gray-500/20 text-gray-300"
-            }`}
-          >
-            {row.userType}
-          </span>
+    // ✅ NEW COLUMN (Premium / Normal + Button) dont need to remove this code, just comment it out if you dont want to use it
+    // {
+    //   header: "User Type",
+    //   accessor: (row: Player) => (
+    //     <div className="flex items-center gap-2">
+    //       <span
+    //         className={`text-xs px-2 py-1 rounded ${
+    //           row.userType === "Premium"
+    //             ? "bg-yellow-500/20 text-yellow-400"
+    //             : "bg-gray-500/20 text-gray-300"
+    //         }`}
+    //       >
+    //         {row.userType}
+    //       </span>
 
-          <Button
-            size="sm"
-            variant="outline"
-            className="text-xs h-7"
-            onClick={() => toggleUserType(row.id)}
-          >
-            Switch
-          </Button>
-        </div>
-      ),
-    },
+    //       <Button
+    //         size="sm"
+    //         variant="outline"
+    //         className="text-xs h-7"
+    //         onClick={() => toggleUserType(row.id)}
+    //       >
+    //         Switch
+    //       </Button>
+    //     </div>
+    //   ),
+    // },
 
     { header: "Status", accessor: "status" as const },
   ];
@@ -135,9 +135,7 @@ const PlayerList = () => {
         data={filtered}
         columns={columns}
         onAction={(row: Player) =>
-          router.push(
-            `/player/${row.id.replace("#", "").replace(" ", "-")}`
-          )
+          router.push(`/player/${row.id.replace("#", "").replace(" ", "-")}`)
         }
         itemsPerPage={10}
       />

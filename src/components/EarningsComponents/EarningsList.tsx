@@ -9,8 +9,8 @@ import {
   setEarningsLimit,
   setEarningsPage,
   setEarningsSearch,
-} from "@/redux/earnings/earningsSlice";
-import { useGetAdminEarningsQuery } from "@/redux/earnings/earningsAPI";
+} from "@/redux/features/earnings/earningsSlice";
+import { useGetAdminEarningsQuery } from "@/redux/features/earnings/earningsAPI";
 import CommonPageSkeleton from "@/components/CommonComponents/CommonPageSkeleton";
 
 const EarningsList = () => {

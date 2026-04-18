@@ -4,7 +4,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import baseAPI from "@/redux/api/baseAPI";
 import authReducer from "@/redux/features/auth/authSlice";
 import dashboardReducer from "@/redux/features/dashboard/dashboardSlice";
-import earningsReducer from "@/redux/earnings/earningsSlice";
+import earningsReducer from "@/redux/features/earnings/earningsSlice";
 import fieldOwnerReducer from "@/redux/features/fieldOwner/fieldOwnerSlice";
 export const store = configureStore({
   reducer: {
