@@ -4,6 +4,7 @@
 
 import StatCard from "@/components/OverViewComponents/StatCard";
 import RevenueChart from "@/components/OverViewComponents/RevenueChart";
+import OverviewSkeleton from "@/components/OverViewComponents/OverviewSkeleton";
 import { Button } from "@/components/ui/button";
 import { DollarSign, User, Users, Crown } from "lucide-react";
 import {
@@ -41,6 +42,10 @@ export default function Home() {
   );
   const { data, isLoading, isFetching, isError } =
     useGetAdminOverviewQuery(selectedPeriod);
+
+  if (isLoading && !data) {
+    return <OverviewSkeleton />;
+  }
 
   const overview = data?.data;
   const filterOptions = overview?.filter.options ?? [

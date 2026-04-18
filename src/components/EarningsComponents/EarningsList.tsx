@@ -70,7 +70,7 @@ const EarningsList = () => {
   const showSkeleton = isLoading && !data;
 
   if (showSkeleton) {
-    return <CommonPageSkeleton titleWidthClass="w-40" columns={6} rows={8} />;
+    return <CommonPageSkeleton titleWidthClass="w-40" columns={6} rows={12} />;
   }
 
   return (
