@@ -1,47 +1,61 @@
 /** @format */
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CustomTable from "@/components/CommonComponents/CustomTable";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, ArrowUpDown } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-
-const mockEarnings = Array.from({ length: 50 }, (_, i) => ({
-  id: `#CH ${565 + i}`,
-  userName: "Rahim Hossain",
-  userId: "#CH 565",
-  plan: "Premium",
-  amount: "€69",
-  date: "25 February, 2025",
-}));
+import { Search } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  setEarningsLimit,
+  setEarningsPage,
+  setEarningsSearch,
+} from "@/redux/earnings/earningsSlice";
+import { useGetAdminEarningsQuery } from "@/redux/earnings/earningsAPI";
+import CommonPageSkeleton from "@/components/CommonComponents/CommonPageSkeleton";
 
 const EarningsList = () => {
-  const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<string[]>([]);
+  const dispatch = useAppDispatch();
+  const { search, page, limit } = useAppSelector((state) => state.earnings);
 
-  const filtered = mockEarnings.filter(
-    (r) =>
-      r.userName.toLowerCase().includes(search.toLowerCase()) ||
-      r.id.toLowerCase().includes(search.toLowerCase()),
-  );
+  const [searchInput, setSearchInput] = useState(search);
 
-  const toggleSelect = (id: string) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  };
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const trimmed = searchInput.trim();
+      if (trimmed !== search) {
+        dispatch(setEarningsSearch(trimmed));
+      }
+    }, 450);
+
+    return () => clearTimeout(timeoutId);
+  }, [dispatch, search, searchInput]);
+
+  const { data, isLoading, isFetching, isError } = useGetAdminEarningsQuery({
+    search,
+    page,
+    limit,
+  });
+
+  const meta = data?.meta;
+
+  const tableData = useMemo(() => {
+    const earnings = data?.data ?? [];
+
+    return earnings.map((item) => ({
+      id: item.display_transaction_id,
+      userName: item.user_name,
+      userId: item.display_user_id,
+      plan: item.plan,
+      amount: item.amount_display,
+      date: item.date_display,
+    }));
+  }, [data?.data]);
 
   const columns = [
     {
       header: "Transaction ID",
-      accessor: (row: (typeof mockEarnings)[0]) => (
+      accessor: (row: (typeof tableData)[number]) => (
         <div className="flex items-center gap-2">
-          <Checkbox
-            checked={selected.includes(row.id)}
-            onCheckedChange={() => toggleSelect(row.id)}
-            className="border-white/20"
-          />
           <span className="text-primary/80">{row.id}</span>
         </div>
       ),
@@ -52,6 +66,12 @@ const EarningsList = () => {
     { header: "Amount", accessor: "amount" as const },
     { header: "Date", accessor: "date" as const },
   ];
+
+  const showSkeleton = isLoading && !data;
+
+  if (showSkeleton) {
+    return <CommonPageSkeleton titleWidthClass="w-40" columns={6} rows={8} />;
+  }
 
   return (
     <div className=" space-y-4">
@@ -65,34 +85,37 @@ const EarningsList = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="pl-9 bg-muted border-white/10 text-primary text-sm h-9 w-full sm:w-60"
             />
           </div>
-          {/* <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-white/10 bg-muted text-primary gap-1.5 text-xs"
-            >
-              <Filter className="w-3.5 h-3.5" />
-              Filter
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-white/10 bg-muted text-primary gap-1.5 text-xs"
-            >
-              <ArrowUpDown className="w-3.5 h-3.5" />
-              Sort by
-            </Button>
-          </div> */}
         </div>
       </div>
 
+      {isError ? (
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+          Failed to load earnings list.
+        </div>
+      ) : null}
+
+      {isFetching && !isLoading ? (
+        <p className="text-xs text-muted-foreground">Refreshing data...</p>
+      ) : null}
+
       {/* Table */}
-      <CustomTable data={filtered} columns={columns} itemsPerPage={10} />
+      <CustomTable
+        data={tableData}
+        columns={columns}
+        itemsPerPage={meta?.limit ?? limit}
+        currentPage={meta?.page ?? page}
+        totalPages={meta?.totalPage ?? 1}
+        totalItems={meta?.total ?? tableData.length}
+        onPageChange={(nextPage) => dispatch(setEarningsPage(nextPage))}
+        onItemsPerPageChange={(nextLimit) =>
+          dispatch(setEarningsLimit(nextLimit))
+        }
+      />
     </div>
   );
 };

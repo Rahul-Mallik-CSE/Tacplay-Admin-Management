@@ -32,20 +32,45 @@ interface CustomTableProps<T> {
   itemsPerPage?: number;
   title?: string;
   additionalCount?: number;
+  currentPage?: number;
+  totalPages?: number;
+  totalItems?: number;
+  onPageChange?: (page: number) => void;
+  onItemsPerPageChange?: (limit: number) => void;
 }
 
-const CustomTable = <T extends Record<string, any>>({
+const CustomTable = <T extends Record<string, unknown>>({
   data,
   columns,
   onAction,
   itemsPerPage = 10,
+  currentPage,
+  totalPages,
+  totalItems,
+  onPageChange,
+  onItemsPerPageChange,
 }: CustomTableProps<T>) => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [internalCurrentPage, setInternalCurrentPage] = useState(1);
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
+  const isServerPagination =
+    typeof currentPage === "number" &&
+    typeof totalPages === "number" &&
+    typeof totalItems === "number";
+
+  const activeCurrentPage = isServerPagination
+    ? currentPage
+    : internalCurrentPage;
+  const activeTotalPages =
+    isServerPagination && totalPages > 0
+      ? totalPages
+      : Math.max(1, Math.ceil(data.length / itemsPerPage));
+  const activeTotalItems = isServerPagination ? totalItems : data.length;
+
+  const startIndex = (activeCurrentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = data.slice(startIndex, endIndex);
+  const currentData = isServerPagination
+    ? data
+    : data.slice(startIndex, endIndex);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -91,8 +116,12 @@ const CustomTable = <T extends Record<string, any>>({
   };
 
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+    if (page >= 1 && page <= activeTotalPages) {
+      if (isServerPagination) {
+        onPageChange?.(page);
+      } else {
+        setInternalCurrentPage(page);
+      }
     }
   };
 
@@ -100,27 +129,29 @@ const CustomTable = <T extends Record<string, any>>({
     const pages: (number | string)[] = [];
     const maxVisible = 5;
 
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
+    if (activeTotalPages <= maxVisible) {
+      for (let i = 1; i <= activeTotalPages; i++) {
         pages.push(i);
       }
     } else {
-      if (currentPage <= 3) {
+      if (activeCurrentPage <= 3) {
         for (let i = 1; i <= 4; i++) pages.push(i);
         pages.push("...");
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
+        pages.push(activeTotalPages);
+      } else if (activeCurrentPage >= activeTotalPages - 2) {
         pages.push(1);
         pages.push("...");
-        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+        for (let i = activeTotalPages - 3; i <= activeTotalPages; i++) {
+          pages.push(i);
+        }
       } else {
         pages.push(1);
         pages.push("...");
-        pages.push(currentPage - 1);
-        pages.push(currentPage);
-        pages.push(currentPage + 1);
+        pages.push(activeCurrentPage - 1);
+        pages.push(activeCurrentPage);
+        pages.push(activeCurrentPage + 1);
         pages.push("...");
-        pages.push(totalPages);
+        pages.push(activeTotalPages);
       }
     }
 
@@ -190,18 +221,19 @@ const CustomTable = <T extends Record<string, any>>({
       {/* Pagination */}
       <div className="flex items-center justify-between px-2">
         <p className="text-xs text-secondary">
-          Showing {startIndex + 1} to {Math.min(endIndex, data.length)} of{" "}
-          {data.length} entries
+          {activeTotalItems > 0
+            ? `Showing ${startIndex + 1} to ${Math.min(endIndex, activeTotalItems)} of ${activeTotalItems} entries`
+            : "No entries found"}
         </p>
         <div className="flex items-center gap-2">
           <Pagination>
             <PaginationContent className="flex-wrap gap-1">
               <PaginationItem>
                 <PaginationPrevious
-                  onClick={() => handlePageChange(currentPage - 1)}
+                  onClick={() => handlePageChange(activeCurrentPage - 1)}
                   className={cn(
                     "text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4 text-secondary hover:text-primary",
-                    currentPage === 1
+                    activeCurrentPage === 1
                       ? "pointer-events-none opacity-50"
                       : "cursor-pointer",
                   )}
@@ -215,10 +247,10 @@ const CustomTable = <T extends Record<string, any>>({
                   ) : (
                     <PaginationLink
                       onClick={() => handlePageChange(page as number)}
-                      isActive={currentPage === page}
+                      isActive={activeCurrentPage === page}
                       className={cn(
                         "cursor-pointer text-xs sm:text-sm h-8 sm:h-10 w-8 sm:w-10 text-secondary hover:text-primary",
-                        currentPage === page &&
+                        activeCurrentPage === page &&
                           "bg-custom-red text-white hover:bg-custom-red/80 hover:text-white border-custom-red",
                       )}
                     >
@@ -233,16 +265,16 @@ const CustomTable = <T extends Record<string, any>>({
                   isActive={true}
                   className="cursor-default bg-custom-red text-white h-8 w-8 text-xs border-custom-red"
                 >
-                  {currentPage}
+                  {activeCurrentPage}
                 </PaginationLink>
               </PaginationItem>
 
               <PaginationItem>
                 <PaginationNext
-                  onClick={() => handlePageChange(currentPage + 1)}
+                  onClick={() => handlePageChange(activeCurrentPage + 1)}
                   className={cn(
                     "text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4 text-secondary hover:text-primary",
-                    currentPage === totalPages
+                    activeCurrentPage === activeTotalPages
                       ? "pointer-events-none opacity-50"
                       : "cursor-pointer",
                   )}
@@ -253,7 +285,8 @@ const CustomTable = <T extends Record<string, any>>({
 
           <select
             className="bg-muted border border-white/10 text-primary text-xs rounded-md px-2 py-1.5 outline-none"
-            defaultValue={itemsPerPage}
+            value={itemsPerPage}
+            onChange={(e) => onItemsPerPageChange?.(Number(e.target.value))}
           >
             <option value={10}>Show 10</option>
             <option value={25}>Show 25</option>
