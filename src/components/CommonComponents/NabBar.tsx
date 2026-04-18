@@ -1,7 +1,7 @@
 /** @format */
 "use client";
 
-import { Bell, ChevronDown } from "lucide-react";
+import { Bell, ChevronDown, User, UserCog, LogOut } from "lucide-react";
 import Image from "next/image";
 
 import {
@@ -10,16 +10,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserCog, LogOut } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import LogoutModal from "./LogOutModal";
 import { SidebarTrigger } from "../ui/sidebar";
+import { useAppSelector } from "@/redux/hooks";
+import { toAbsoluteMediaUrl } from "@/lib/utils";
 
 const NavBar = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const user = useAppSelector((state) => state.auth.user);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  const hasEmail = Boolean(user?.email?.trim());
+  const displayName = user?.full_name?.trim() || "User";
+  const profileImage = toAbsoluteMediaUrl(user?.profile_image);
+  const showProfileImage = hasEmail && Boolean(profileImage);
 
   const handleLogout = () => {
     console.log("Logging out...");
@@ -64,16 +71,23 @@ const NavBar = () => {
           <DropdownMenu>
             <DropdownMenuTrigger className="flex cursor-pointer border border-transparent hover:border-secondary items-center gap-1 sm:gap-2  rounded-lg px-1 sm:px-2 py-1 transition-colors shrink-0">
               <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-800 flex items-center justify-center overflow-hidden shrink-0">
-                <Image
-                  src="/logo.png"
-                  alt="Profile"
-                  width={40}
-                  height={40}
-                  className="object-cover"
-                />
+                {showProfileImage ? (
+                  <Image
+                    src={profileImage as string}
+                    alt={displayName}
+                    width={40}
+                    height={40}
+                    unoptimized
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                )}
               </div>
               <div className="text-left hidden sm:block">
-                <p className="text-sm font-medium text-primary">Moni Roy</p>
+                <p className="text-sm font-medium text-primary">
+                  {displayName}
+                </p>
               </div>
               <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-primary hidden sm:block" />
             </DropdownMenuTrigger>
