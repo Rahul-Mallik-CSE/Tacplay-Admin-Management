@@ -110,7 +110,7 @@ const FieldOwnerList = () => {
   const showSkeleton = isLoading && !data;
 
   if (showSkeleton) {
-    return <CommonPageSkeleton titleWidthClass="w-36" columns={7} rows={8} />;
+    return <CommonPageSkeleton titleWidthClass="w-36" columns={6} rows={7} />;
   }
 
   return (
