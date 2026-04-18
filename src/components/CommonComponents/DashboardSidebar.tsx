@@ -8,7 +8,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "../ui/sidebar";
 
@@ -16,25 +15,28 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  LayoutGrid,
-  Briefcase,
-  Calendar,
-  Bell,
-  Settings,
-  Crown,
-  LogOut,
-} from "lucide-react";
+import { LayoutGrid, Calendar, Bell, Settings, LogOut } from "lucide-react";
 import { Button } from "../ui/button";
 import LogoutModal from "./LogOutModal";
 import { GrUserManager } from "react-icons/gr";
 import { FiUsers } from "react-icons/fi";
+import { toast } from "react-toastify";
+import {
+  clearAuthTokens,
+  getErrorMessage,
+  getSuccessMessage,
+} from "@/lib/auth";
+import { clearAuthSession } from "@/redux/features/auth/authSlice";
+import { useLogoutMutation } from "@/redux/features/auth/authAPI";
+import { useAppDispatch } from "@/redux/hooks";
 
 export default function DashboardSidebar() {
   const { state } = useSidebar();
   const pathname = usePathname();
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [logout] = useLogoutMutation();
 
   const isCollapsed = state === "collapsed";
 
@@ -71,12 +73,20 @@ export default function DashboardSidebar() {
     },
   ];
 
-  const handleLogout = () => {
-    router.push("/sign-in");
-    // Add your logout logic here (e.g., clear tokens, redirect, etc.)
-    console.log("Logging out...");
-    setIsLogoutModalOpen(false);
-    // Example: router.push('/login');
+  const handleLogout = async () => {
+    try {
+      const response = await logout().unwrap();
+      toast.success(getSuccessMessage(response, "Logged out successfully"));
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, "Logout failed, clearing local session"),
+      );
+    } finally {
+      clearAuthTokens();
+      dispatch(clearAuthSession());
+      setIsLogoutModalOpen(false);
+      router.push("/sign-in");
+    }
   };
 
   if (
@@ -106,10 +116,11 @@ export default function DashboardSidebar() {
                       ${isCollapsed ? "px-0.5" : "px-2"}`}
         >
           <div
-            className={`mb-6  flex  items-center justify-center rounded-md   ${isCollapsed
-              ? " flex items-center w-full justify-center mx-auto p-1 "
-              : "gap-2"
-              }`}
+            className={`mb-6  flex  items-center justify-center rounded-md   ${
+              isCollapsed
+                ? " flex items-center w-full justify-center mx-auto p-1 "
+                : "gap-2"
+            }`}
           >
             <Link href="/" className="flex gap-2 ">
               {isCollapsed ? (
