@@ -4,13 +4,15 @@ import React from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import type { SessionScoreResultData } from "@/types/SessionManagementTypes";
 
 interface MatchResultModalProps {
   open: boolean;
   onClose: () => void;
+  result: SessionScoreResultData | null;
 }
 
-const MatchResultModal = ({ open, onClose }: MatchResultModalProps) => {
+const MatchResultModal = ({ open, onClose, result }: MatchResultModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="bg-card border border-white/10 max-w-sm w-full p-0 overflow-hidden rounded-2xl">
@@ -53,20 +55,24 @@ const MatchResultModal = ({ open, onClose }: MatchResultModalProps) => {
           </div>
 
           <h2 className="text-primary font-bold text-base mb-4">
-            Cracknel Supreme Match
+            Session #{result?.session_id ?? "-"}
           </h2>
 
           {/* Vs Section */}
           <div className="flex items-center justify-between gap-2 mb-4">
             {/* Team A */}
             <div className="flex-1 text-right space-y-1">
-              <p className="text-emerald-400 text-xs font-medium">Victory</p>
+              <p className="text-emerald-400 text-xs font-medium">
+                {result?.team_a_result?.toUpperCase() || "-"}
+              </p>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-right">
-                  <p className="text-primary font-bold text-sm">
-                    Snake Green Squad
+                  <p className="text-primary font-bold text-sm">Team A</p>
+                  <p className="text-emerald-400 text-2xl font-black">
+                    {typeof result?.team_a_score === "number"
+                      ? `${result.team_a_score > 0 ? "+" : ""}${result.team_a_score}`
+                      : "-"}
                   </p>
-                  <p className="text-emerald-400 text-2xl font-black">+52</p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
                   <span className="text-lg">🐍</span>
@@ -81,17 +87,19 @@ const MatchResultModal = ({ open, onClose }: MatchResultModalProps) => {
             {/* Team B */}
             <div className="flex-1 text-left space-y-1">
               <p className="text-red-400 text-xs font-medium text-right">
-                Victory
+                {result?.team_b_result?.toUpperCase() || "-"}
               </p>
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
                   <span className="text-lg">🐂</span>
                 </div>
                 <div>
-                  <p className="text-primary font-bold text-sm">
-                    Red Bull Squad
+                  <p className="text-primary font-bold text-sm">Team B</p>
+                  <p className="text-red-400 text-2xl font-black">
+                    {typeof result?.team_b_score === "number"
+                      ? `${result.team_b_score > 0 ? "+" : ""}${result.team_b_score}`
+                      : "-"}
                   </p>
-                  <p className="text-red-400 text-2xl font-black">-12</p>
                 </div>
               </div>
             </div>
@@ -99,9 +107,9 @@ const MatchResultModal = ({ open, onClose }: MatchResultModalProps) => {
 
           {/* Match Info */}
           <div className="text-chart-4 text-xs space-y-0.5">
-            <p>25 Nov. 2022</p>
-            <p>12:00 pm - 01:00 pm</p>
-            <p>Toggle Fun Club</p>
+            <p>{result?.status_display || "-"}</p>
+            <p>Winner: {result?.winner || "-"}</p>
+            <p>Result submitted successfully</p>
           </div>
         </div>
 

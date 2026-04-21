@@ -11,6 +11,7 @@ import dashboardReducer from "@/redux/features/dashboard/dashboardSlice";
 import earningsReducer from "@/redux/features/earnings/earningsSlice";
 import fieldOwnerReducer from "@/redux/features/fieldOwner/fieldOwnerSlice";
 import playerReducer from "@/redux/features/player/playerSlice";
+import sessionManagementReducer from "@/redux/features/sessionManagement/sessionManagementSlice";
 import { clearAuthUser, saveAuthUser } from "@/lib/auth";
 
 const authUserCookieSyncMiddleware =
@@ -34,6 +35,7 @@ export const store = configureStore({
     earnings: earningsReducer,
     fieldOwner: fieldOwnerReducer,
     player: playerReducer,
+    sessionManagement: sessionManagementReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

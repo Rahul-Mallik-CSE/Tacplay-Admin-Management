@@ -9,14 +9,26 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type {
+  SessionScoreValue,
+  SessionTeamPlayer,
+} from "@/types/SessionManagementTypes";
 
 interface PlayerDetailsSheetProps {
   open: boolean;
   onClose: () => void;
-  playerName?: string;
+  player: SessionTeamPlayer | null;
   teamName?: string;
+  isSubmitting?: boolean;
+  onSubmitPlayerResult: (bookingId: number, result: SessionScoreValue) => void;
 }
 
 const InfoRow = ({
@@ -39,14 +51,19 @@ const InfoRow = ({
 const PlayerDetailsSheet = ({
   open,
   onClose,
-  playerName = "Elon Rektler",
-  teamName = "Green Snack Squad",
+  player,
+  teamName,
+  isSubmitting = false,
+  onSubmitPlayerResult,
 }: PlayerDetailsSheetProps) => {
-  const [score, setScore] = useState("50");
+  const [result, setResult] = useState<SessionScoreValue>("draw");
 
   const handleScoreSubmit = () => {
-    console.log("Score submitted:", score);
-    onClose();
+    if (!player) {
+      return;
+    }
+
+    onSubmitPlayerResult(player.booking_id, result);
   };
 
   return (
@@ -58,49 +75,49 @@ const PlayerDetailsSheet = ({
         <SheetHeader className="">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-primary text-base font-bold">
-              Player Details & Score Management
+              Player Details & Result Management
             </SheetTitle>
             <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-1 rounded-md font-medium">
-              Check-In
+              {player?.result ? player.result.toUpperCase() : "PENDING"}
             </span>
           </div>
           <SheetDescription className="text-muted-foreground text-xs">
-            View full booking information and transaction.
+            Update individual player result for this session.
           </SheetDescription>
         </SheetHeader>
 
         {/* Player Info */}
         <div className="space-y-0 ">
           <h3 className="text-primary font-semibold text-sm ">Player Info</h3>
-          <InfoRow label="Team name" value={teamName} />
-          <InfoRow label="Player ID" value="#CN 256" />
-          <InfoRow label="Player Name" value={playerName} />
-          <InfoRow label="Email" value="name@gmail.com" />
-          <InfoRow label="Contact Number" value="+26 256 2564" />
+          <InfoRow label="Team name" value={teamName || "-"} />
+          <InfoRow label="Player ID" value={String(player?.player_id ?? "-")} />
+          <InfoRow
+            label="Booking ID"
+            value={String(player?.booking_id ?? "-")}
+          />
+          <InfoRow label="Player Name" value={player?.player_name || "-"} />
+          <InfoRow label="Current Result" value={player?.result || "-"} />
         </div>
 
         <Separator className="bg-white/10 " />
 
-        {/* Booking Info */}
+        {/* Player Stats */}
         <div className="space-y-0 ">
-          <h3 className="text-primary font-semibold text-sm ">Booking Info</h3>
-          <InfoRow label="Booking ID" value="#CNH 565" />
-          <InfoRow label="Transaction ID" value="#CNH 565" />
-          <InfoRow label="Amount" value="$25.25" />
+          <h3 className="text-primary font-semibold text-sm ">Player Stats</h3>
+          <InfoRow label="Win" value={String(player?.card_stats.win ?? 0)} />
+          <InfoRow label="Loss" value={String(player?.card_stats.loss ?? 0)} />
+          <InfoRow label="Draw" value={String(player?.card_stats.draw ?? 0)} />
           <InfoRow
-            label="Platform Fee (Free User)"
-            value="$05.25"
-            valueClass="text-chart-4"
+            label="Played"
+            value={String(player?.card_stats.played ?? 0)}
           />
-          <InfoRow label="Net Profit" value="$24.05" />
-          <InfoRow label="Payment Method" value="PayPal" />
-          <InfoRow label="Date & Time" value="02:30 AM, 25 Jan 2026" />
+          <InfoRow label="Rank" value={String(player?.card_stats.rank ?? 0)} />
           <InfoRow
-            label="Payment Status"
+            label="Current Score"
             value={
-              <span className="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs px-2 py-0.5 rounded">
-                Paid
-              </span>
+              typeof player?.awarded_score === "number"
+                ? String(player.awarded_score)
+                : "-"
             }
           />
         </div>
@@ -110,25 +127,34 @@ const PlayerDetailsSheet = ({
         {/* Score Management */}
         <div className="space-y-0">
           <h3 className="text-primary font-semibold text-sm">
-            Score Management
+            Result Management
           </h3>
           <div className="space-y-1.5">
-            <label className="text-muted-foreground text-xs">Match Score</label>
-            <Input
-              type="number"
-              value={score}
-              onChange={(e) => setScore(e.target.value)}
-              className="bg-input border-white/10 text-primary"
-              placeholder="Enter score"
-            />
+            <label className="text-muted-foreground text-xs">
+              Player Result
+            </label>
+            <Select
+              value={result}
+              onValueChange={(value) => setResult(value as SessionScoreValue)}
+            >
+              <SelectTrigger className="w-full bg-input border-white/10 text-primary">
+                <SelectValue placeholder="Select result" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="win">Win</SelectItem>
+                <SelectItem value="loss">Loss</SelectItem>
+                <SelectItem value="draw">Draw</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         <Button
           className="w-full bg-custom-red hover:bg-custom-red/90 text-white"
           onClick={handleScoreSubmit}
+          disabled={!player || isSubmitting}
         >
-          Score Submit
+          {isSubmitting ? "Submitting..." : "Submit Result"}
         </Button>
       </SheetContent>
     </Sheet>

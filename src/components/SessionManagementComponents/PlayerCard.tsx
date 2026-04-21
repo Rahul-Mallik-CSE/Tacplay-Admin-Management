@@ -5,28 +5,19 @@ import React from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-
-interface Player {
-  id: number;
-  name: string;
-  win: number;
-  loses: number;
-  played: number;
-  rank: number;
-  score?: number;
-  image: string;
-  team: "A" | "B";
-}
+import { toAbsoluteMediaUrl } from "@/lib/utils";
+import type { SessionTeamPlayer } from "@/types/SessionManagementTypes";
 
 interface PlayerCardProps {
-  player: Player;
-  onViewDetails: (player: Player) => void;
+  player: SessionTeamPlayer;
+  onViewDetails: (player: SessionTeamPlayer) => void;
 }
 
 const PlayerCard = ({ player, onViewDetails }: PlayerCardProps) => {
-  const hasScore = player.score !== undefined;
-  const isPositiveScore = hasScore && (player.score ?? 0) > 0;
+  const hasScore = typeof player.awarded_score === "number";
+  const isPositiveScore = hasScore && player.awarded_score > 0;
   const isYellowTheme = player.team === "B";
+  const avatar = toAbsoluteMediaUrl(player.player_avatar) || "/left-player.jpg";
 
   const frameGradient = isYellowTheme
     ? "bg-[linear-gradient(135deg,#6a4b08,#d4b122,#3f2f0b)]"
@@ -47,13 +38,7 @@ const PlayerCard = ({ player, onViewDetails }: PlayerCardProps) => {
 
   return (
     <div className="relative">
-      <div
-        className={cn(
-          "relative rounded-3xl p-[1px]  ",
-          frameGradient,
-          cardGlow,
-        )}
-      >
+      <div className={cn("relative rounded-3xl p-px", frameGradient, cardGlow)}>
         <div className="absolute inset-0 opacity-50 blur-3xl" aria-hidden>
           <div
             className={cn(
@@ -90,12 +75,12 @@ const PlayerCard = ({ player, onViewDetails }: PlayerCardProps) => {
           {/* Player image */}
           <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden shrink-0 ring-2 ring-white/10">
             <Image
-              src={player.image}
-              alt={`${player.name} avatar`}
+              src={avatar}
+              alt={`${player.player_name} avatar`}
               fill
               sizes="112px"
               className="object-cover"
-              priority
+              unoptimized
             />
             <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
           </div>
@@ -105,7 +90,7 @@ const PlayerCard = ({ player, onViewDetails }: PlayerCardProps) => {
             {/* Top row */}
             <div className="flex items-center justify-between gap-3 pb-3 border-b border-white/10">
               <p className="text-white text-base sm:text-lg font-semibold truncate">
-                {player.name}
+                {player.player_name}
               </p>
               <Button
                 size="sm"
@@ -123,10 +108,10 @@ const PlayerCard = ({ player, onViewDetails }: PlayerCardProps) => {
             <div className="grid grid-cols-5 items-center pt-3 text-center gap-0">
               {["Win", "Loses", "Played", "Rank"].map((label, idx) => {
                 const value = [
-                  player.win,
-                  player.loses,
-                  player.played,
-                  player.rank,
+                  player.card_stats.win,
+                  player.card_stats.loss,
+                  player.card_stats.played,
+                  player.card_stats.rank,
                 ][idx];
 
                 return (
@@ -168,8 +153,8 @@ const PlayerCard = ({ player, onViewDetails }: PlayerCardProps) => {
                 >
                   {hasScore
                     ? isPositiveScore
-                      ? `+${player.score}`
-                      : player.score
+                      ? `+${player.awarded_score}`
+                      : player.awarded_score
                     : "-"}
                 </span>
                 <span

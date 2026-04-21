@@ -106,6 +106,7 @@ const baseAPI = createApi({
     "Earnings",
     "FieldOwner",
     "Player",
+    "SessionManagement",
   ],
   endpoints: () => ({}),
 });
