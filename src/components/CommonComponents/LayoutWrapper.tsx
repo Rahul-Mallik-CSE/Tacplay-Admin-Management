@@ -8,6 +8,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/CommonComponents/DashboardSidebar";
 import NavBar from "@/components/CommonComponents/NabBar";
 import { ToastContainer } from "react-toastify";
+import LanguageProvider from "@/components/CommonComponents/LanguageProvider";
 
 import "react-toastify/dist/ReactToastify.css";
 
@@ -53,15 +54,17 @@ export default function LayoutWrapper({
   }
 
   return (
-    <SidebarProvider>
-      <ToastContainer {...toastContainerProps} />
-      <DashboardSidebar />
-      <SidebarInset className="overflow-x-hidden">
-        <div className="bg-root-bg min-h-screen ">
-          <NavBar />
-          {children}
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    <LanguageProvider>
+      <SidebarProvider>
+        <ToastContainer {...toastContainerProps} />
+        <DashboardSidebar />
+        <SidebarInset className="overflow-x-hidden">
+          <div className="bg-root-bg min-h-screen ">
+            <NavBar />
+            {children}
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+    </LanguageProvider>
   );
 }

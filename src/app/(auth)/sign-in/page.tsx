@@ -13,6 +13,71 @@ import { saveAuthTokens, getErrorMessage, getSuccessMessage } from "@/lib/auth";
 import { useLoginAdminMutation } from "@/redux/features/auth/authAPI";
 import { useAppDispatch } from "@/redux/hooks";
 import { setAuthSession } from "@/redux/features/auth/authSlice";
+import { useTranslation } from "react-i18next";
+import { type SupportedLanguage } from "@/lib/i18n/i18n";
+
+const copy = {
+  en: {
+    welcomeBack: "Welcome Back",
+    description:
+      "Manage your arena, sessions, bookings, and ranked match results.",
+    emailAddress: "Email Address",
+    password: "Password",
+    forgotPassword: "Forgot Password?",
+    emailPlaceholder: "Enter your email address",
+    passwordPlaceholder: "Enter your password",
+    signIn: "Sign In",
+    signingIn: "Signing In...",
+    required: "Email and password are required",
+    success: "Login successful",
+    failed: "Login failed",
+  },
+  de: {
+    welcomeBack: "Willkommen zurück",
+    description:
+      "Verwalte Arena, Sessions, Buchungen und Ergebnislisten an einem Ort.",
+    emailAddress: "E-Mail-Adresse",
+    password: "Passwort",
+    forgotPassword: "Passwort vergessen?",
+    emailPlaceholder: "E-Mail-Adresse eingeben",
+    passwordPlaceholder: "Passwort eingeben",
+    signIn: "Anmelden",
+    signingIn: "Anmeldung läuft...",
+    required: "E-Mail und Passwort sind erforderlich",
+    success: "Anmeldung erfolgreich",
+    failed: "Anmeldung fehlgeschlagen",
+  },
+  fr: {
+    welcomeBack: "Bon retour",
+    description:
+      "Gérez votre arène, vos sessions, vos réservations et vos résultats de matchs.",
+    emailAddress: "Adresse e-mail",
+    password: "Mot de passe",
+    forgotPassword: "Mot de passe oublié ?",
+    emailPlaceholder: "Entrez votre adresse e-mail",
+    passwordPlaceholder: "Entrez votre mot de passe",
+    signIn: "Se connecter",
+    signingIn: "Connexion...",
+    required: "L'e-mail et le mot de passe sont requis",
+    success: "Connexion réussie",
+    failed: "Échec de la connexion",
+  },
+  es: {
+    welcomeBack: "Bienvenido de nuevo",
+    description:
+      "Gestiona tu arena, sesiones, reservas y resultados de partidas.",
+    emailAddress: "Correo electrónico",
+    password: "Contraseña",
+    forgotPassword: "¿Olvidaste tu contraseña?",
+    emailPlaceholder: "Introduce tu correo electrónico",
+    passwordPlaceholder: "Introduce tu contraseña",
+    signIn: "Iniciar sesión",
+    signingIn: "Iniciando sesión...",
+    required: "El correo y la contraseña son obligatorios",
+    success: "Inicio de sesión correcto",
+    failed: "Error al iniciar sesión",
+  },
+} as const;
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,13 +85,16 @@ const SignInPage = () => {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { i18n } = useTranslation();
   const [loginAdmin, { isLoading }] = useLoginAdminMutation();
+  const language = (i18n.language as SupportedLanguage) || "en";
+  const text = copy[language] ?? copy.en;
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!email.trim() || !password.trim()) {
-      toast.error("Email and password are required");
+      toast.error(text.required);
       return;
     }
 
@@ -42,7 +110,7 @@ const SignInPage = () => {
       saveAuthTokens(access, refresh);
       dispatch(setAuthSession(response.data.user));
 
-      toast.success(getSuccessMessage(response, "Login successful"));
+      toast.success(getSuccessMessage(response, text.success));
 
       const from =
         typeof window !== "undefined"
@@ -51,7 +119,7 @@ const SignInPage = () => {
 
       router.push(from || "/");
     } catch (error) {
-      toast.error(getErrorMessage(error, "Login failed"));
+      toast.error(getErrorMessage(error, text.failed));
     }
   };
 
@@ -72,10 +140,10 @@ const SignInPage = () => {
 
         {/* Heading */}
         <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-2 text-center">
-          Welcome Back
+          {text.welcomeBack}
         </h1>
         <p className="text-sm text-muted-foreground text-center mb-8 max-w-sm">
-          Manage your arena, sessions, bookings, and ranked match results.
+          {text.description}
         </p>
 
         {/* Form */}
@@ -83,11 +151,11 @@ const SignInPage = () => {
           {/* Business Email */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-primary">
-              Email Address
+              {text.emailAddress}
             </label>
             <input
               type="email"
-              placeholder="Enter your email address"
+              placeholder={text.emailPlaceholder}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2.5 rounded-lg bg-input/30 border border-white/10 text-sm text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-custom-yellow/50 transition-colors"
@@ -99,19 +167,19 @@ const SignInPage = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-primary">
-                Password
+                {text.password}
               </label>
               <Link
                 href="/forgot-pass"
                 className="text-xs text-primary hover:text-custom-yellow transition-colors font-medium"
               >
-                Forgot Password?
+                {text.forgotPassword}
               </Link>
             </div>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
+                placeholder={text.passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2.5 pr-11 rounded-lg bg-input/30 border border-white/10 text-sm text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-custom-yellow/50 transition-colors"
@@ -137,7 +205,7 @@ const SignInPage = () => {
             disabled={isLoading}
             className="w-full cursor-pointer py-3 rounded-lg bg-custom-red text-white text-sm font-semibold hover:bg-custom-red/90 transition-colors border-2 border-border"
           >
-            {isLoading ? "Signing In..." : "Sign In"}
+            {isLoading ? text.signingIn : text.signIn}
           </button>
         </form>
       </div>

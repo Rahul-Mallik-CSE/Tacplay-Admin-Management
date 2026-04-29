@@ -26,11 +26,14 @@ import {
 import { clearAuthSession } from "@/redux/features/auth/authSlice";
 import { toast } from "react-toastify";
 import { Skeleton } from "@/components/ui/skeleton";
+import LanguageSelector from "@/components/CommonComponents/LanguageSelector";
+import { useTranslation } from "react-i18next";
 
 const NavBar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const user = useAppSelector((state) => state.auth.user);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [logout] = useLogoutMutation();
@@ -57,7 +60,9 @@ const NavBar = () => {
     user?.email?.trim() || profileUser?.email_address?.trim();
   const hasEmail = Boolean(resolvedEmail);
   const displayName =
-    user?.full_name?.trim() || profileUser?.full_name?.trim() || "User";
+    user?.full_name?.trim() ||
+    profileUser?.full_name?.trim() ||
+    t("common.dashboard");
   const profileImage = toAbsoluteMediaUrl(
     user?.profile_image ?? profileUser?.profile_image,
   );
@@ -68,11 +73,9 @@ const NavBar = () => {
   const handleLogout = async () => {
     try {
       const response = await logout().unwrap();
-      toast.success(getSuccessMessage(response, "Logged out successfully"));
+      toast.success(getSuccessMessage(response, t("navbar.logout")));
     } catch (error) {
-      toast.error(
-        getErrorMessage(error, "Logout failed, clearing local session"),
-      );
+      toast.error(getErrorMessage(error, t("navbar.logout")));
     } finally {
       clearAuthTokens();
       dispatch(clearAuthSession());
@@ -91,12 +94,13 @@ const NavBar = () => {
           </div>
           {/* Left side - Title */}
           <h1 className="text-sm sm:text-base md:text-lg lg:text-2xl 2xl:text-3xl font-bold text-primary truncate">
-            Dashboard
+            {t("navbar.title")}
           </h1>
         </div>
 
         {/* Right side - Notification, Profile */}
         <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+          <LanguageSelector />
           {isProfileLoading ? (
             <div className="flex items-center gap-2 rounded-lg px-1 sm:px-2 py-1 shrink-0">
               <Skeleton className="w-6 h-6 sm:w-8 sm:h-8 rounded-full" />
@@ -135,7 +139,7 @@ const NavBar = () => {
                   className="flex items-center gap-3 px-4 py-3 cursor-pointer"
                 >
                   <UserCog className="w-5 h-5 text-blue-500" />
-                  <span className="text-base">Setting</span>
+                  <span className="text-base">{t("navbar.settings")}</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
@@ -143,7 +147,7 @@ const NavBar = () => {
                   className="flex items-center gap-3 px-4 py-3 cursor-pointer"
                 >
                   <LogOut className="w-5 h-5 text-red-500" />
-                  <span className="text-base">Log out</span>
+                  <span className="text-base">{t("navbar.logout")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

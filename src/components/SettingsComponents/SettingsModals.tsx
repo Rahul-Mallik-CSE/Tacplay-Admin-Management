@@ -14,6 +14,102 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Camera } from "lucide-react";
 import { toAbsoluteMediaUrl } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
+import { type SupportedLanguage } from "@/lib/i18n/i18n";
+
+const copy = {
+  en: {
+    editAccountInfo: "Edit Account Info",
+    editAccountDescription:
+      "Make changes to your profile info. Click save when done.",
+    saveChanges: "Save Changes",
+    saving: "Saving...",
+    fullName: "Full name",
+    setNewPassword: "Set a new password",
+    confirmPasswordMismatch: "Confirm Password does not match New Password",
+    changePassword: "Change Password",
+    changing: "Changing...",
+    newPassword: "New password",
+    confirmPassword: "Confirm password",
+    setPlayerScore: "Set Player Score",
+    setPlayerScoreDescription:
+      "Set the scores for win, loss, and draw outcomes.",
+    winScore: "Win Score",
+    lossScore: "Loss Score",
+    drawScore: "Draw Score",
+    saveScores: "Save Scores",
+    saveScoresLoading: "Saving...",
+  },
+  de: {
+    editAccountInfo: "Kontoinfo bearbeiten",
+    editAccountDescription:
+      "Ändere deine Profildaten und speichere anschließend.",
+    saveChanges: "Änderungen speichern",
+    saving: "Wird gespeichert...",
+    fullName: "Vollständiger Name",
+    setNewPassword: "Neues Passwort festlegen",
+    confirmPasswordMismatch:
+      "Bestätigung stimmt nicht mit dem neuen Passwort überein",
+    changePassword: "Passwort ändern",
+    changing: "Wird geändert...",
+    newPassword: "Neues Passwort",
+    confirmPassword: "Passwort bestätigen",
+    setPlayerScore: "Spielerwertung festlegen",
+    setPlayerScoreDescription:
+      "Lege die Punkte für Sieg, Niederlage und Unentschieden fest.",
+    winScore: "Sieg-Punkte",
+    lossScore: "Niederlagen-Punkte",
+    drawScore: "Unentschieden-Punkte",
+    saveScores: "Punkte speichern",
+    saveScoresLoading: "Wird gespeichert...",
+  },
+  fr: {
+    editAccountInfo: "Modifier les informations du compte",
+    editAccountDescription:
+      "Modifiez les informations de votre profil puis enregistrez.",
+    saveChanges: "Enregistrer les modifications",
+    saving: "Enregistrement...",
+    fullName: "Nom complet",
+    setNewPassword: "Définir un nouveau mot de passe",
+    confirmPasswordMismatch:
+      "La confirmation ne correspond pas au nouveau mot de passe",
+    changePassword: "Changer le mot de passe",
+    changing: "Modification...",
+    newPassword: "Nouveau mot de passe",
+    confirmPassword: "Confirmer le mot de passe",
+    setPlayerScore: "Définir le score du joueur",
+    setPlayerScoreDescription:
+      "Définissez les scores pour victoire, défaite et nul.",
+    winScore: "Score de victoire",
+    lossScore: "Score de défaite",
+    drawScore: "Score de nul",
+    saveScores: "Enregistrer les scores",
+    saveScoresLoading: "Enregistrement...",
+  },
+  es: {
+    editAccountInfo: "Editar información de la cuenta",
+    editAccountDescription:
+      "Realiza cambios en tu perfil y guarda cuando termines.",
+    saveChanges: "Guardar cambios",
+    saving: "Guardando...",
+    fullName: "Nombre completo",
+    setNewPassword: "Establecer una nueva contraseña",
+    confirmPasswordMismatch:
+      "La confirmación no coincide con la nueva contraseña",
+    changePassword: "Cambiar contraseña",
+    changing: "Cambiando...",
+    newPassword: "Nueva contraseña",
+    confirmPassword: "Confirmar contraseña",
+    setPlayerScore: "Establecer puntuación del jugador",
+    setPlayerScoreDescription:
+      "Define las puntuaciones para victoria, derrota y empate.",
+    winScore: "Puntuación de victoria",
+    lossScore: "Puntuación de derrota",
+    drawScore: "Puntuación de empate",
+    saveScores: "Guardar puntuaciones",
+    saveScoresLoading: "Guardando...",
+  },
+} as const;
 
 type SettingsStep = "edit" | "password" | "setScore" | null;
 
@@ -76,6 +172,9 @@ const EditModal = ({
   initialProfileImage?: string | null;
   isSaving: boolean;
 }) => {
+  const { i18n } = useTranslation();
+  const language = (i18n.language as SupportedLanguage) || "en";
+  const text = copy[language] ?? copy.en;
   const [name, setName] = useState(initialName);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
@@ -114,10 +213,10 @@ const EditModal = ({
       <DialogContent className="bg-card border border-white/10 max-w-sm w-full rounded-2xl p-6">
         <DialogHeader>
           <DialogTitle className="text-primary text-lg font-bold text-center">
-            Edit Account Info
+            {text.editAccountInfo}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-xs text-center">
-            Make changes to your profile info. Click save when done.
+            {text.editAccountDescription}
           </DialogDescription>
         </DialogHeader>
 
@@ -158,11 +257,14 @@ const EditModal = ({
         <div className="space-y-3 mb-4">
           <div className="space-y-1">
             <label className="text-muted-foreground text-xs">Full name</label>
+            <label className="text-muted-foreground text-xs">
+              {text.fullName}
+            </label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="bg-input border-white/10 text-primary"
-              placeholder="Full name"
+              placeholder={text.fullName}
             />
           </div>
         </div>
@@ -172,7 +274,7 @@ const EditModal = ({
           onClick={handleSubmit}
           disabled={isSaving}
         >
-          {isSaving ? "Saving..." : "Save Changes"}
+          {isSaving ? text.saving : text.saveChanges}
         </Button>
       </DialogContent>
     </Dialog>
@@ -190,13 +292,16 @@ const NewPasswordModal = ({
   onSave: (payload: ChangePasswordPayload) => Promise<void>;
   isSaving: boolean;
 }) => {
+  const { i18n } = useTranslation();
+  const language = (i18n.language as SupportedLanguage) || "en";
+  const text = copy[language] ?? copy.en;
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async () => {
     if (newPassword !== confirmPassword) {
-      setError("Confirm Password does not match New Password");
+      setError(text.confirmPasswordMismatch);
       return;
     }
 
@@ -215,14 +320,14 @@ const NewPasswordModal = ({
 
         <DialogHeader>
           <DialogTitle className="text-primary text-lg font-bold text-center">
-            Set a new password
+            {text.setNewPassword}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3 my-4">
           <Input
             type="password"
-            placeholder="New password"
+            placeholder={text.newPassword}
             value={newPassword}
             onChange={(e) => {
               setNewPassword(e.target.value);
@@ -232,7 +337,7 @@ const NewPasswordModal = ({
           />
           <Input
             type="password"
-            placeholder="Confirm password"
+            placeholder={text.confirmPassword}
             value={confirmPassword}
             onChange={(e) => {
               setConfirmPassword(e.target.value);
@@ -250,7 +355,7 @@ const NewPasswordModal = ({
           onClick={handleSubmit}
           disabled={isSaving}
         >
-          {isSaving ? "Changing..." : "Change Password"}
+          {isSaving ? text.changing : text.changePassword}
         </Button>
       </DialogContent>
     </Dialog>
@@ -274,6 +379,9 @@ const SetScoreModal = ({
   };
   isSaving: boolean;
 }) => {
+  const { i18n } = useTranslation();
+  const language = (i18n.language as SupportedLanguage) || "en";
+  const text = copy[language] ?? copy.en;
   const [winScore, setWinScore] = useState(String(defaults.winScore));
   const [lossScore, setLossScore] = useState(String(defaults.lossScore));
   const [drawScore, setDrawScore] = useState(String(defaults.drawScore));
@@ -291,16 +399,18 @@ const SetScoreModal = ({
       <DialogContent className="bg-card border border-white/10 max-w-sm w-full rounded-2xl p-6">
         <DialogHeader>
           <DialogTitle className="text-primary text-lg font-bold text-center">
-            Set Player Score
+            {text.setPlayerScore}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-xs text-center">
-            Set the scores for win, loss, and draw outcomes.
+            {text.setPlayerScoreDescription}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3 my-4">
           <div className="space-y-1">
-            <label className="text-muted-foreground text-xs">Win Score</label>
+            <label className="text-muted-foreground text-xs">
+              {text.winScore}
+            </label>
             <Input
               type="number"
               placeholder="e.g., 5"
@@ -310,7 +420,9 @@ const SetScoreModal = ({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-muted-foreground text-xs">Loss Score</label>
+            <label className="text-muted-foreground text-xs">
+              {text.lossScore}
+            </label>
             <Input
               type="number"
               placeholder="e.g., -2"
@@ -320,7 +432,9 @@ const SetScoreModal = ({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-muted-foreground text-xs">Draw Score</label>
+            <label className="text-muted-foreground text-xs">
+              {text.drawScore}
+            </label>
             <Input
               type="number"
               placeholder="e.g., 1"
@@ -336,7 +450,7 @@ const SetScoreModal = ({
           onClick={handleSubmit}
           disabled={isSaving}
         >
-          {isSaving ? "Saving..." : "Save Scores"}
+          {isSaving ? text.saveScoresLoading : text.saveScores}
         </Button>
       </DialogContent>
     </Dialog>

@@ -12,6 +12,74 @@ import { useResetPasswordMutation } from "@/redux/features/auth/authAPI";
 import { useAppDispatch } from "@/redux/hooks";
 import { setAuthSession } from "@/redux/features/auth/authSlice";
 import { getErrorMessage, getSuccessMessage, saveAuthTokens } from "@/lib/auth";
+import { useTranslation } from "react-i18next";
+import { type SupportedLanguage } from "@/lib/i18n/i18n";
+
+const copy = {
+  en: {
+    title: "Set a new password",
+    description:
+      "Make your secure password to keep your dashboard safe and accessible.",
+    password: "Password",
+    confirmPassword: "Confirm Password",
+    passwordPlaceholder: "Enter new password",
+    confirmPlaceholder: "Re-enter your password",
+    changePassword: "Change Password",
+    updating: "Updating...",
+    signInPage: "Sign In Page?",
+    required: "Both password fields are required",
+    mismatch: "Passwords do not match",
+    success: "Password reset successful",
+    failed: "Failed to reset password",
+  },
+  de: {
+    title: "Neues Passwort festlegen",
+    description:
+      "Lege ein sicheres Passwort fest, damit dein Dashboard geschützt bleibt.",
+    password: "Passwort",
+    confirmPassword: "Passwort bestätigen",
+    passwordPlaceholder: "Neues Passwort eingeben",
+    confirmPlaceholder: "Passwort erneut eingeben",
+    changePassword: "Passwort ändern",
+    updating: "Wird aktualisiert...",
+    signInPage: "Anmeldeseite?",
+    required: "Beide Passwortfelder sind erforderlich",
+    mismatch: "Die Passwörter stimmen nicht überein",
+    success: "Passwort erfolgreich zurückgesetzt",
+    failed: "Passwort konnte nicht zurückgesetzt werden",
+  },
+  fr: {
+    title: "Définir un nouveau mot de passe",
+    description:
+      "Choisissez un mot de passe sécurisé pour protéger votre tableau de bord.",
+    password: "Mot de passe",
+    confirmPassword: "Confirmer le mot de passe",
+    passwordPlaceholder: "Entrez le nouveau mot de passe",
+    confirmPlaceholder: "Saisissez à nouveau le mot de passe",
+    changePassword: "Changer le mot de passe",
+    updating: "Mise à jour...",
+    signInPage: "Page de connexion ?",
+    required: "Les deux champs de mot de passe sont requis",
+    mismatch: "Les mots de passe ne correspondent pas",
+    success: "Mot de passe réinitialisé avec succès",
+    failed: "Échec de la réinitialisation du mot de passe",
+  },
+  es: {
+    title: "Establece una nueva contraseña",
+    description: "Crea una contraseña segura para mantener protegido tu panel.",
+    password: "Contraseña",
+    confirmPassword: "Confirmar contraseña",
+    passwordPlaceholder: "Introduce la nueva contraseña",
+    confirmPlaceholder: "Vuelve a introducir la contraseña",
+    changePassword: "Cambiar contraseña",
+    updating: "Actualizando...",
+    signInPage: "¿Página de inicio de sesión?",
+    required: "Los dos campos de contraseña son obligatorios",
+    mismatch: "Las contraseñas no coinciden",
+    success: "Contraseña restablecida con éxito",
+    failed: "No se pudo restablecer la contraseña",
+  },
+} as const;
 
 const ResetPasswordPage = () => {
   const [password, setPassword] = useState("");
@@ -20,18 +88,21 @@ const ResetPasswordPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { i18n } = useTranslation();
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
+  const language = (i18n.language as SupportedLanguage) || "en";
+  const text = copy[language] ?? copy.en;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!password || !confirmPassword) {
-      toast.error("Both password fields are required");
+      toast.error(text.required);
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error(text.mismatch);
       return;
     }
 
@@ -44,10 +115,10 @@ const ResetPasswordPage = () => {
       saveAuthTokens(response.data.tokens.access, response.data.tokens.refresh);
       dispatch(setAuthSession(response.data.user));
 
-      toast.success(getSuccessMessage(response, "Password reset successful"));
+      toast.success(getSuccessMessage(response, text.success));
       router.push("/");
     } catch (error) {
-      toast.error(getErrorMessage(error, "Failed to reset password"));
+      toast.error(getErrorMessage(error, text.failed));
     }
   };
 
@@ -73,11 +144,10 @@ const ResetPasswordPage = () => {
         {/* Heading */}
         <div className="text-center space-y-2">
           <h1 className="text-xl sm:text-2xl font-bold text-primary">
-            Set a new password
+            {text.title}
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            Make your secure password to keep your dashboard safe and
-            accessible.
+            {text.description}
           </p>
         </div>
 
@@ -85,11 +155,13 @@ const ResetPasswordPage = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Password */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-primary">Password</label>
+            <label className="text-sm font-medium text-primary">
+              {text.password}
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter new password"
+                placeholder={text.passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2.5 pr-11 rounded-lg bg-input/30 border border-white/10 text-sm text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-custom-yellow/50 transition-colors"
@@ -112,12 +184,12 @@ const ResetPasswordPage = () => {
           {/* Confirm Password */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-primary">
-              Confirm Password
+              {text.confirmPassword}
             </label>
             <div className="relative">
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                placeholder="Re-enter your password"
+                placeholder={text.confirmPlaceholder}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full px-4 py-2.5 pr-11 rounded-lg bg-input/30 border border-white/10 text-sm text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-custom-yellow/50 transition-colors"
@@ -143,7 +215,7 @@ const ResetPasswordPage = () => {
             disabled={isLoading}
             className="w-full py-3 rounded-lg bg-custom-red text-white text-sm font-semibold hover:bg-custom-red/90 transition-colors border-2 border-border mt-2"
           >
-            {isLoading ? "Updating..." : "Change Password"}
+            {isLoading ? text.updating : text.changePassword}
           </button>
         </form>
 
@@ -154,7 +226,7 @@ const ResetPasswordPage = () => {
             href="/sign-in"
             className="text-primary font-semibold underline underline-offset-2 hover:text-custom-yellow transition-colors"
           >
-            Sign In Page?
+            {text.signInPage}
           </Link>
         </p>
       </div>

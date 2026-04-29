@@ -1,7 +1,10 @@
 /** @format */
+"use client";
+
 import React from "react";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface StatCardProps {
   title: string;
@@ -12,6 +15,7 @@ interface StatCardProps {
 }
 
 const StatCard = ({ title, value, change, icon, iconBg }: StatCardProps) => {
+  const { t } = useTranslation();
   const isUp = change >= 0;
 
   return (
@@ -31,7 +35,8 @@ const StatCard = ({ title, value, change, icon, iconBg }: StatCardProps) => {
             <TrendingDown className="w-3 h-3" />
           )}
           <span>
-            {Math.abs(change)}% {isUp ? "Up" : "Down"} from last period
+            {Math.abs(change)}% {isUp ? t("common.up") : t("common.down")}{" "}
+            {t("common.lastPeriod")}
           </span>
         </div>
       </div>

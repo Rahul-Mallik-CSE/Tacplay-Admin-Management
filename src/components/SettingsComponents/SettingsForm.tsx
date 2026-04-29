@@ -26,10 +26,78 @@ import { getErrorMessage, getSuccessMessage, saveAuthTokens } from "@/lib/auth";
 import { useAppDispatch } from "@/redux/hooks";
 import { setAuthSession } from "@/redux/features/auth/authSlice";
 import { SettingsFormSkeleton } from "./SettingFormSkeleton";
+import { useTranslation } from "react-i18next";
+import { type SupportedLanguage } from "@/lib/i18n/i18n";
+
+const copy = {
+  en: {
+    title: "Settings",
+    edit: "Edit",
+    fullName: "Full name",
+    changePassword: "Change password",
+    setPlayerScore: "Set player Score",
+    profileUpdated: "Profile updated successfully",
+    failedProfileUpdate: "Failed to update profile",
+    passwordChanged: "Password changed successfully",
+    failedPasswordChange: "Failed to change password",
+    noScoreChanges: "No score changes to save",
+    scoreUpdated: "Player score updated",
+    scoreCreated: "Player score created",
+    failedScoreSave: "Failed to save player score",
+  },
+  de: {
+    title: "Einstellungen",
+    edit: "Bearbeiten",
+    fullName: "Vollständiger Name",
+    changePassword: "Passwort ändern",
+    setPlayerScore: "Spielerwertung festlegen",
+    profileUpdated: "Profil erfolgreich aktualisiert",
+    failedProfileUpdate: "Profil konnte nicht aktualisiert werden",
+    passwordChanged: "Passwort erfolgreich geändert",
+    failedPasswordChange: "Passwort konnte nicht geändert werden",
+    noScoreChanges: "Keine Änderungen zum Speichern",
+    scoreUpdated: "Spielerwertung aktualisiert",
+    scoreCreated: "Spielerwertung erstellt",
+    failedScoreSave: "Spielerwertung konnte nicht gespeichert werden",
+  },
+  fr: {
+    title: "Paramètres",
+    edit: "Modifier",
+    fullName: "Nom complet",
+    changePassword: "Changer le mot de passe",
+    setPlayerScore: "Définir le score du joueur",
+    profileUpdated: "Profil mis à jour avec succès",
+    failedProfileUpdate: "Échec de la mise à jour du profil",
+    passwordChanged: "Mot de passe modifié avec succès",
+    failedPasswordChange: "Échec du changement de mot de passe",
+    noScoreChanges: "Aucune modification à enregistrer",
+    scoreUpdated: "Score du joueur mis à jour",
+    scoreCreated: "Score du joueur créé",
+    failedScoreSave: "Échec de l'enregistrement du score du joueur",
+  },
+  es: {
+    title: "Ajustes",
+    edit: "Editar",
+    fullName: "Nombre completo",
+    changePassword: "Cambiar contraseña",
+    setPlayerScore: "Establecer puntuación del jugador",
+    profileUpdated: "Perfil actualizado correctamente",
+    failedProfileUpdate: "No se pudo actualizar el perfil",
+    passwordChanged: "Contraseña cambiada correctamente",
+    failedPasswordChange: "No se pudo cambiar la contraseña",
+    noScoreChanges: "No hay cambios de puntuación para guardar",
+    scoreUpdated: "Puntuación del jugador actualizada",
+    scoreCreated: "Puntuación del jugador creada",
+    failedScoreSave: "No se pudo guardar la puntuación del jugador",
+  },
+} as const;
 
 const SettingsForm = () => {
   const [modalStep, setModalStep] = useState<SettingsStep>(null);
   const dispatch = useAppDispatch();
+  const { i18n } = useTranslation();
+  const language = (i18n.language as SupportedLanguage) || "en";
+  const text = copy[language] ?? copy.en;
 
   const {
     data: myProfileResponse,
@@ -68,7 +136,7 @@ const SettingsForm = () => {
 
   const handleEditSave = async (payload: EditProfilePayload) => {
     if (!payload.fullName.trim()) {
-      toast.error("Full name is required");
+      toast.error(text.fullName);
       return;
     }
 
@@ -90,18 +158,16 @@ const SettingsForm = () => {
         }),
       );
 
-      toast.success(
-        getSuccessMessage(response, "Profile updated successfully"),
-      );
+      toast.success(getSuccessMessage(response, text.profileUpdated));
       setModalStep(null);
     } catch (error) {
-      toast.error(getErrorMessage(error, "Failed to update profile"));
+      toast.error(getErrorMessage(error, text.failedProfileUpdate));
     }
   };
 
   const handlePasswordChange = async (payload: ChangePasswordPayload) => {
     if (!payload.newPassword || !payload.confirmPassword) {
-      toast.error("Both password fields are required");
+      toast.error(text.changePassword);
       return;
     }
 
@@ -122,12 +188,10 @@ const SettingsForm = () => {
         }),
       );
 
-      toast.success(
-        getSuccessMessage(response, "Password changed successfully"),
-      );
+      toast.success(getSuccessMessage(response, text.passwordChanged));
       setModalStep(null);
     } catch (error) {
-      toast.error(getErrorMessage(error, "Failed to change password"));
+      toast.error(getErrorMessage(error, text.failedPasswordChange));
     }
   };
 
@@ -153,13 +217,13 @@ const SettingsForm = () => {
         }
 
         if (Object.keys(patchPayload).length === 0) {
-          toast.info("No score changes to save");
+          toast.info(text.noScoreChanges);
           setModalStep(null);
           return;
         }
 
         const response = await updateScore(patchPayload).unwrap();
-        toast.success(getSuccessMessage(response, "Player score updated"));
+        toast.success(getSuccessMessage(response, text.scoreUpdated));
       } else {
         const response = await createScore({
           win_score: payload.winScore,
@@ -167,12 +231,12 @@ const SettingsForm = () => {
           draw_score: payload.drawScore,
         }).unwrap();
 
-        toast.success(getSuccessMessage(response, "Player score created"));
+        toast.success(getSuccessMessage(response, text.scoreCreated));
       }
 
       setModalStep(null);
     } catch (error) {
-      toast.error(getErrorMessage(error, "Failed to save player score"));
+      toast.error(getErrorMessage(error, text.failedScoreSave));
     }
   };
 
@@ -186,7 +250,7 @@ const SettingsForm = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-primary text-xl sm:text-2xl font-bold">
-            Settings
+            {text.title}
           </h1>
           <Button
             size="sm"
@@ -194,7 +258,7 @@ const SettingsForm = () => {
             onClick={() => setModalStep("edit")}
           >
             <Pencil className="w-3.5 h-3.5" />
-            Edit
+            {text.edit}
           </Button>
         </div>
 
@@ -248,7 +312,7 @@ const SettingsForm = () => {
             className="w-full flex items-center justify-between p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
           >
             <span className="text-primary text-sm font-medium">
-              Change password
+              {text.changePassword}
             </span>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </button>
@@ -259,7 +323,7 @@ const SettingsForm = () => {
             className="w-full flex items-center justify-between p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
           >
             <span className="text-primary text-sm font-medium">
-              Set player Score
+              {text.setPlayerScore}
             </span>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </button>

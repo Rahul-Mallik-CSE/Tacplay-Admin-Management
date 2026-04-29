@@ -16,6 +16,75 @@ import {
 } from "@/redux/features/sessionManagement/sessionManagementSlice";
 import { useGetSessionManagementListQuery } from "@/redux/features/sessionManagement/sessionManagementAPI";
 import type { SessionManagementListItem } from "@/types/SessionManagementTypes";
+import { useTranslation } from "react-i18next";
+import { type SupportedLanguage } from "@/lib/i18n/i18n";
+
+const copy = {
+  en: {
+    title: "Session Management List",
+    search: "Search...",
+    failed: "Failed to load sessions.",
+    refreshing: "Refreshing data...",
+    sessionId: "Session ID",
+    sessionName: "Session Name",
+    fieldId: "Field ID",
+    player: "Player",
+    amount: "Amount",
+    status: "Status",
+    allStatus: "All Status",
+    allMatchTypes: "All Match Types",
+    ranked: "Ranked",
+    social: "Social",
+  },
+  de: {
+    title: "Sitzungsverwaltung",
+    search: "Suchen...",
+    failed: "Sessions konnten nicht geladen werden.",
+    refreshing: "Daten werden aktualisiert...",
+    sessionId: "Session-ID",
+    sessionName: "Sessionname",
+    fieldId: "Feld-ID",
+    player: "Spieler",
+    amount: "Betrag",
+    status: "Status",
+    allStatus: "Alle Status",
+    allMatchTypes: "Alle Spieltypen",
+    ranked: "Rangliste",
+    social: "Social",
+  },
+  fr: {
+    title: "Gestion des sessions",
+    search: "Rechercher...",
+    failed: "Impossible de charger les sessions.",
+    refreshing: "Actualisation des données...",
+    sessionId: "ID de session",
+    sessionName: "Nom de session",
+    fieldId: "ID du terrain",
+    player: "Joueur",
+    amount: "Montant",
+    status: "Statut",
+    allStatus: "Tous les statuts",
+    allMatchTypes: "Tous les types de match",
+    ranked: "Classé",
+    social: "Social",
+  },
+  es: {
+    title: "Gestión de sesiones",
+    search: "Buscar...",
+    failed: "No se pudieron cargar las sesiones.",
+    refreshing: "Actualizando datos...",
+    sessionId: "ID de sesión",
+    sessionName: "Nombre de sesión",
+    fieldId: "ID del campo",
+    player: "Jugador",
+    amount: "Importe",
+    status: "Estado",
+    allStatus: "Todos los estados",
+    allMatchTypes: "Todos los tipos de partida",
+    ranked: "Clasificada",
+    social: "Social",
+  },
+} as const;
 
 const extractSessionNumericId = (sessionId: string) => {
   const matched = sessionId.match(/\d+/g);
@@ -29,10 +98,13 @@ const extractSessionNumericId = (sessionId: string) => {
 const SessionList = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { i18n } = useTranslation();
   const { search, page, limit, status, matchType } = useAppSelector(
     (state) => state.sessionManagement.list,
   );
   const [searchInput, setSearchInput] = useState(search);
+  const language = (i18n.language as SupportedLanguage) || "en";
+  const text = copy[language] ?? copy.en;
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -72,18 +144,18 @@ const SessionList = () => {
 
   const columns = [
     {
-      header: "Session ID",
+      header: text.sessionId,
       accessor: (row: (typeof tableData)[number]) => (
         <div className="flex items-center gap-2">
           <span className="text-primary/80">{row.sessionId}</span>
         </div>
       ),
     },
-    { header: "Session Name", accessor: "sessionName" as const },
-    { header: "Field ID", accessor: "fieldId" as const },
-    { header: "Player", accessor: "player" as const },
-    { header: "Amount", accessor: "amount" as const },
-    { header: "Status", accessor: "status" as const },
+    { header: text.sessionName, accessor: "sessionName" as const },
+    { header: text.fieldId, accessor: "fieldId" as const },
+    { header: text.player, accessor: "player" as const },
+    { header: text.amount, accessor: "amount" as const },
+    { header: text.status, accessor: "status" as const },
   ];
 
   const showSkeleton = isLoading && !data;
@@ -97,13 +169,13 @@ const SessionList = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h1 className="text-primary text-xl sm:text-2xl font-bold">
-          Session Management List
+          {text.title}
         </h1>
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search..."
+              placeholder={text.search}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="pl-9 bg-muted border-white/10 text-primary text-sm h-9 w-full sm:w-60"
@@ -116,12 +188,52 @@ const SessionList = () => {
               dispatch(setSessionManagementStatus(e.target.value))
             }
           >
-            <option value="all">All Status</option>
-            <option value="open">Open</option>
-            <option value="full">Full</option>
-            <option value="ongoing">Ongoing</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="all">{text.allStatus}</option>
+            <option value="open">
+              {text.allStatus === "Alle Status"
+                ? "Offen"
+                : text.allStatus === "Todos los estados"
+                  ? "Abierto"
+                  : text.allStatus === "Tous les statuts"
+                    ? "Ouvert"
+                    : "Open"}
+            </option>
+            <option value="full">
+              {text.allStatus === "Alle Status"
+                ? "Voll"
+                : text.allStatus === "Todos los estados"
+                  ? "Lleno"
+                  : text.allStatus === "Tous les statuts"
+                    ? "Complet"
+                    : "Full"}
+            </option>
+            <option value="ongoing">
+              {text.allStatus === "Alle Status"
+                ? "Laufend"
+                : text.allStatus === "Todos los estados"
+                  ? "En curso"
+                  : text.allStatus === "Tous les statuts"
+                    ? "En cours"
+                    : "Ongoing"}
+            </option>
+            <option value="completed">
+              {text.allStatus === "Alle Status"
+                ? "Abgeschlossen"
+                : text.allStatus === "Todos los estados"
+                  ? "Completado"
+                  : text.allStatus === "Tous les statuts"
+                    ? "Terminé"
+                    : "Completed"}
+            </option>
+            <option value="cancelled">
+              {text.allStatus === "Alle Status"
+                ? "Abgebrochen"
+                : text.allStatus === "Todos los estados"
+                  ? "Cancelado"
+                  : text.allStatus === "Tous les statuts"
+                    ? "Annulé"
+                    : "Cancelled"}
+            </option>
           </select>
           <select
             className="bg-muted border border-white/10 text-primary text-xs rounded-md px-2 py-1.5 outline-none h-9"
@@ -130,21 +242,21 @@ const SessionList = () => {
               dispatch(setSessionManagementMatchType(e.target.value))
             }
           >
-            <option value="all">All Match Types</option>
-            <option value="ranked">Ranked</option>
-            <option value="social">Social</option>
+            <option value="all">{text.allMatchTypes}</option>
+            <option value="ranked">{text.ranked}</option>
+            <option value="social">{text.social}</option>
           </select>
         </div>
       </div>
 
       {isError ? (
         <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
-          Failed to load sessions.
+          {text.failed}
         </div>
       ) : null}
 
       {isFetching && !isLoading ? (
-        <p className="text-xs text-muted-foreground">Refreshing data...</p>
+        <p className="text-xs text-muted-foreground">{text.refreshing}</p>
       ) : null}
 
       {/* Table */}

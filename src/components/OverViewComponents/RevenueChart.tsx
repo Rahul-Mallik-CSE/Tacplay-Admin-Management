@@ -11,6 +11,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { TrendingUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { languageLocaleMap, type SupportedLanguage } from "@/lib/i18n/i18n";
 
 type RevenueChartPoint = {
   label: string;
@@ -39,13 +41,23 @@ interface CustomTooltipProps {
 }
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  const { i18n } = useTranslation();
+  const language = (i18n.language as SupportedLanguage) || "en";
+  const locale = languageLocaleMap[language] || "en-US";
+  const currencyFormatter = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
   if (active && payload && payload.length) {
     return (
       <div className="bg-card border border-white/10 rounded-lg px-3 py-2 shadow-lg text-xs">
         <p className="text-muted-foreground mb-1 font-medium">{label}</p>
         {payload.map((entry: TooltipPayloadItem, index: number) => (
           <p key={index} style={{ color: entry.color }}>
-            {entry.name}: ${entry.value.toLocaleString()}
+            {entry.name}: {currencyFormatter.format(entry.value)}
           </p>
         ))}
       </div>
@@ -54,18 +66,6 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   return null;
 };
 
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-
-const compactCurrencyFormatter = new Intl.NumberFormat("en-US", {
-  notation: "compact",
-  maximumFractionDigits: 1,
-});
-
 const RevenueChart = ({
   totalRevenue,
   changePercentage,
@@ -73,7 +73,22 @@ const RevenueChart = ({
   comparisonSeriesLabel,
   data,
 }: RevenueChartProps) => {
+  const { t, i18n } = useTranslation();
   const isUp = changePercentage >= 0;
+  const language = (i18n.language as SupportedLanguage) || "en";
+  const locale = languageLocaleMap[language] || "en-US";
+
+  const currencyFormatter = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  const compactCurrencyFormatter = new Intl.NumberFormat(locale, {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  });
 
   return (
     <div className="bg-card rounded-xl p-4 sm:p-6 border border-white/5">
@@ -82,7 +97,7 @@ const RevenueChart = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h3 className="text-primary text-base md:text-2xl font-semibold">
-              Revenue
+              {t("overview.revenue")}
             </h3>
             <div
               className={`flex items-center gap-1 text-xs font-medium ${
@@ -144,7 +159,9 @@ const RevenueChart = ({
               tick={{ fill: "#525273", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={(v) => `$${compactCurrencyFormatter.format(v)}`}
+              tickFormatter={(v) =>
+                `$${compactCurrencyFormatter.format(Number(v))}`
+              }
             />
             <Tooltip content={<CustomTooltip />} />
             <Area

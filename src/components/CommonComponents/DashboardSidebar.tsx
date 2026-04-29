@@ -29,12 +29,14 @@ import {
 import { clearAuthSession } from "@/redux/features/auth/authSlice";
 import { useLogoutMutation } from "@/redux/features/auth/authAPI";
 import { useAppDispatch } from "@/redux/hooks";
+import { useTranslation } from "react-i18next";
 
 export default function DashboardSidebar() {
   const { state } = useSidebar();
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [logout] = useLogoutMutation();
 
@@ -44,43 +46,41 @@ export default function DashboardSidebar() {
     {
       href: "/",
       icon: LayoutGrid,
-      label: "Overview",
+      label: t("sidebar.overview"),
     },
     {
       href: "/field-owner",
       icon: GrUserManager,
-      label: "Field Owner",
+      label: t("sidebar.fieldOwner"),
     },
     {
       href: "/player",
       icon: FiUsers,
-      label: "Player",
+      label: t("sidebar.player"),
     },
     {
       href: "/session-management",
       icon: Calendar,
-      label: "Session Management",
+      label: t("sidebar.sessionManagement"),
     },
     {
       href: "/earnings",
       icon: Bell,
-      label: "Earnings",
+      label: t("sidebar.earnings"),
     },
     {
       href: "/settings",
       icon: Settings,
-      label: "Settings",
+      label: t("sidebar.settings"),
     },
   ];
 
   const handleLogout = async () => {
     try {
       const response = await logout().unwrap();
-      toast.success(getSuccessMessage(response, "Logged out successfully"));
+      toast.success(getSuccessMessage(response, t("sidebar.logOut")));
     } catch (error) {
-      toast.error(
-        getErrorMessage(error, "Logout failed, clearing local session"),
-      );
+      toast.error(getErrorMessage(error, t("sidebar.logOut")));
     } finally {
       clearAuthTokens();
       dispatch(clearAuthSession());
@@ -216,7 +216,7 @@ export default function DashboardSidebar() {
               variant="default"
               size="sm"
               className={cn(
-                "flex text-black grow items-center justify-center text-primary",
+                "flex grow items-center justify-center text-primary",
                 isCollapsed
                   ? "rounded-md w-8 h-8 p-0"
                   : "h-10 md:h-10 w-full gap-2 rounded-md p-3",
@@ -228,7 +228,7 @@ export default function DashboardSidebar() {
               ) : (
                 <>
                   <LogOut size={18} />
-                  <span className="text-base">Log Out</span>
+                  <span className="text-base">{t("sidebar.logOut")}</span>
                 </>
               )}
             </Button>

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/pagination";
 import { Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface CustomTableProps<T> {
   data: T[];
@@ -51,6 +52,7 @@ const CustomTable = <T extends Record<string, unknown>>({
   onItemsPerPageChange,
 }: CustomTableProps<T>) => {
   const [internalCurrentPage, setInternalCurrentPage] = useState(1);
+  const { t } = useTranslation();
 
   const isServerPagination =
     typeof currentPage === "number" &&
@@ -223,7 +225,7 @@ const CustomTable = <T extends Record<string, unknown>>({
         <p className="text-xs text-secondary">
           {activeTotalItems > 0
             ? `Showing ${startIndex + 1} to ${Math.min(endIndex, activeTotalItems)} of ${activeTotalItems} entries`
-            : "No entries found"}
+            : t("common.noEntries")}
         </p>
         <div className="flex items-center gap-2">
           <Pagination>

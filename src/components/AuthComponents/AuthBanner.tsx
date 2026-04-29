@@ -4,31 +4,30 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-
-const slides = [
-  {
-    title: "Command Your Arena",
-    description:
-      "Set up your field, schedule tactical sessions, and manage competitive paintball events with full control.",
-  },
-  {
-    title: "Manage Your Battles",
-    description:
-      "Organize ranked and social matches, track player stats, and build your arena's competitive reputation.",
-  },
-  {
-    title: "Grow Your Community",
-    description:
-      "Attract new players, manage bookings, and create memorable paintball experiences at your field.",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 interface AuthBannerProps {
   children: React.ReactNode;
 }
 
 const AuthBanner: React.FC<AuthBannerProps> = ({ children }) => {
+  const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const slides = [
+    {
+      title: t("authBanner.slides.0.title"),
+      description: t("authBanner.slides.0.description"),
+    },
+    {
+      title: t("authBanner.slides.1.title"),
+      description: t("authBanner.slides.1.description"),
+    },
+    {
+      title: t("authBanner.slides.2.title"),
+      description: t("authBanner.slides.2.description"),
+    },
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -89,9 +88,15 @@ const AuthBanner: React.FC<AuthBannerProps> = ({ children }) => {
 
             {/* Tagline */}
             <p className="mt-6 text-sm font-bold tracking-widest">
-              <span className="text-custom-red">GEAR UP.</span>{" "}
-              <span className="text-custom-yellow">MATCH UP.</span>{" "}
-              <span className="text-custom-yellow">LEVEL UP.</span>
+              <span className="text-custom-red">
+                {t("authBanner.tagline.0")}
+              </span>{" "}
+              <span className="text-custom-yellow">
+                {t("authBanner.tagline.1")}
+              </span>{" "}
+              <span className="text-custom-yellow">
+                {t("authBanner.tagline.2")}
+              </span>
             </p>
           </div>
         </div>
